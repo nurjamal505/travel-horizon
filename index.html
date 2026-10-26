@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Travel Horizon — Discover Kyrgyzstan. Feel the Freedom.</title>
+<meta name="description" content="Tours and travel experiences across Kyrgyzstan: alpine lakes, Tian Shan treks, yurt stays and Silk Road heritage.">
+<meta property="og:title" content="Travel Horizon — Discover Kyrgyzstan">
+<meta property="og:description" content="Journey beyond the ordinary: mountains, lakes and nomadic traditions.">
+<meta property="og:type" content="website">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TravelAgency","name":"Travel Horizon","description":"Tours and travel experiences across Kyrgyzstan."}</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+<style>
+:root{--g:#173D32;--sd:#DCC9A8;--bg:#F8F6F0;--fg:#202521;--cd:#FFFFFF;--mt:#5a625d;--ln:#e4dfd2;--ac:#173D32;--acf:#fff;--mb:#dfe9e4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--fg:#F2EFE6;--cd:#1b2420;--mt:#a9b2ac;--ln:#2c3832;--ac:#DCC9A8;--acf:#173D32;--mb:#1f2b26;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121815;--fg:#F2EFE6;--cd:#1b2420;--mt:#a9b2ac;--ln:#2c3832;--ac:#DCC9A8;--acf:#173D32;--mb:#1f2b26;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(76px + env(safe-area-inset-top,0px))}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;font:16px/1.6 Manrope,Inter,system-ui,sans-serif;background:var(--bg);color:var(--fg)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+h1,h2,h3{line-height:1.12;margin:0 0 .5em;letter-spacing:-.02em}
+h1{font-size:clamp(2.4rem,6.5vw,5rem);font-weight:800}h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800}h3{font-size:1.15rem}
+a{color:inherit}p{margin:0 0 .8em}.mt{color:var(--mt)}
+:focus-visible{outline:3px solid #c9a24b;outline-offset:2px}
+.w{max-width:1200px;margin:auto;padding:72px 20px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--ln)}
+.hd{max-width:1200px;margin:auto;padding:10px 20px;display:flex;align-items:center;gap:16px}
+.logo{font-weight:800;font-size:1.2rem;text-decoration:none;display:flex;gap:8px;align-items:center;margin-right:auto}
+nav{display:flex;gap:20px;align-items:center}nav a{text-decoration:none;font-weight:600;font-size:.92rem}nav a:hover{text-decoration:underline}
+#bg{display:none;background:none;border:1px solid var(--ln);color:inherit;border-radius:10px;padding:8px 12px;font-size:1.1rem}
+@media(max-width:960px){#bg{display:block}nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg);flex-direction:column;align-items:flex-start;padding:16px 20px;border-bottom:1px solid var(--ln)}nav.open{display:flex}.hd .b{display:none}}
+input,select,textarea{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:9px 10px;width:100%}
+.lang{width:auto;padding:6px 8px}
+.b{display:inline-block;background:var(--ac);color:var(--acf);border:2px solid var(--ac);border-radius:99px;padding:10px 20px;font-family:inherit;font-weight:600;font-size:.95rem;cursor:pointer;text-decoration:none}
+.b.o{background:transparent;color:var(--fg);border-color:var(--ln)}
+.hero{position:relative;min-height:92vh;display:flex;align-items:flex-end;color:#fff;overflow:hidden;background:var(--g)}
+.hero .bgi{position:absolute;inset:0}.hero .bgi svg{width:100%;height:100%;display:block}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,25,20,.88),rgba(10,25,20,.2) 60%,rgba(10,25,20,.45))}
+.hero .in{position:relative;z-index:1;max-width:1200px;margin:auto;padding:120px 20px 36px;width:100%}
+.hero p.sb{max-width:620px;font-size:1.15rem}
+.hero .b{background:var(--sd);color:var(--g);border-color:var(--sd)}.hero .b.o{background:transparent;color:#fff;border-color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;background:var(--cd);color:var(--fg);padding:14px;border-radius:18px;margin-top:28px;align-items:end}
+.sr .b{background:var(--ac);color:var(--acf);border-color:var(--ac)}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:600}
+.intro{max-width:760px;font-size:1.35rem;font-weight:600}
+.dg,.tgd{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+@media(min-width:900px){.dg .c:nth-child(6n+1){grid-column:span 2}}
+.c{background:var(--cd);border-radius:20px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.08);transition:transform .25s;display:flex;flex-direction:column;animation:up .5s both}
+.c:hover{transform:translateY(-4px)}.c[data-d]{cursor:pointer}
+@keyframes up{from{opacity:0;transform:translateY(12px)}}
+.im{position:relative;height:210px;overflow:hidden}.im svg{width:100%;height:100%;display:block}
+.pill{position:absolute;top:12px;left:12px;background:var(--g);color:#fff;border-radius:99px;padding:2px 12px;font-size:.8rem;font-weight:600}
+.cb{padding:18px;display:flex;flex-direction:column;gap:8px;flex:1}.cb p{margin:0}.cb .row{margin-top:auto}
+.tg{display:flex;gap:6px;flex-wrap:wrap}.tg span{font-size:.75rem;background:var(--ln);border-radius:99px;padding:2px 10px}
+.fl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;background:var(--cd);padding:16px;border-radius:16px;margin:20px 0;align-items:end}
+.empty{grid-column:1/-1;text-align:center;padding:40px;background:var(--cd);border-radius:16px}
+.more{text-align:center;margin-top:28px}
+.ex{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.ex button{all:unset;cursor:pointer;position:relative;border-radius:18px;overflow:hidden;height:190px;display:block}
+.ex button:focus-visible{outline:3px solid #c9a24b}
+.ex svg{width:100%;height:100%;display:block}.ex span{position:absolute;left:0;right:0;bottom:0;padding:30px 14px 12px;color:#fff;font-weight:700;background:linear-gradient(transparent,rgba(10,25,20,.85))}
+.mapw{display:grid;grid-template-columns:2fr 1fr;gap:20px}@media(max-width:800px){.mapw{grid-template-columns:1fr}}
+.mbg{fill:var(--mb)}.lk{fill:#25a39b;opacity:.6}.gl{stroke:var(--ln)}
+.mk{cursor:pointer}.mk circle:first-child{fill:transparent}.mk circle:nth-child(2){fill:var(--ac);stroke:#fff;stroke-width:2}.mk .on{fill:#c0572b!important}.mk:focus-visible circle:first-child{stroke:var(--fg);stroke-width:2}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.chips .b{padding:6px 14px;font-size:.85rem}
+.mc{background:var(--cd);border-radius:18px;overflow:hidden}.mc .cb{gap:6px}
+.pr3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.pr3>div{background:var(--cd);border-radius:16px;padding:20px}
+.band{background:var(--g);color:#F8F6F0}.band .w{padding:64px 20px}
+.band label{color:#F8F6F0}.band input,.band select{background:#fff;color:#202521}
+.band .b{background:var(--sd);color:var(--g);border-color:var(--sd)}.band .mt{color:#cfd8d2}
+.pf{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end;margin-top:20px}
+.pres{background:var(--cd);color:var(--fg);border-radius:14px;padding:12px 16px;margin-top:10px;display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.bad{font-size:.75rem;color:#a2461f}
+details{background:var(--cd);border-radius:14px;padding:14px 18px;margin-bottom:10px}summary{font-weight:700;cursor:pointer}
+footer{background:var(--g);color:#F8F6F0}footer .w{padding:48px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px}footer a{display:block;text-decoration:none;margin:4px 0}footer small{opacity:.75}
+dialog{max-width:860px;width:calc(100% - 24px);max-height:92vh;border:0;border-radius:22px;padding:0;background:var(--cd);color:var(--fg)}dialog::backdrop{background:rgba(10,20,16,.6)}
+.dp{padding:22px 26px 30px}.x{position:absolute;top:12px;right:12px;z-index:2;background:var(--cd);color:var(--fg);border:0;border-radius:50%;width:38px;height:38px;font-size:1.1rem;cursor:pointer}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:600px){.two{grid-template-columns:1fr}}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.fg{grid-template-columns:1fr}}
+em{color:#b3361b;font-style:normal;font-size:.78rem;min-height:1em}
+.warn{background:#fff3d6;color:#5b4300;border-radius:10px;padding:10px 14px}
+.kv{padding-left:18px}.leaflet-container{font:inherit;border-radius:16px;z-index:0}.im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+</style>
+</head>
+<body>
+<header><div class="hd">
+<a class="logo" href="#top"><svg width="26" height="20" viewBox="0 0 26 20" aria-hidden="true"><path d="M0 20 9 4l5 8 3-4 9 12z" fill="currentColor"/></svg>Travel Horizon</a>
+<button id="bg" aria-expanded="false" aria-controls="nv" aria-label="Menu">☰</button>
+<nav id="nv"><a href="#destinations" data-i="n1"></a><a href="#tours" data-i="n2"></a><a href="#experiences" data-i="n3"></a><a href="#about" data-i="n4"></a><a href="#footer" data-i="n5"></a>
+<select class="lang" aria-label="Language"><option value="en">EN</option><option value="ru">RU</option><option value="ky">KY</option><option value="es">ES</option></select></nav>
+<a class="b" href="#planner" data-i="plan"></a>
+</div></header>
+<main id="top">
+<section class="hero"><div class="bgi" id="hbg"></div><div class="in">
+<h1 data-i="tag"></h1><p class="sb" data-i="sub"></p>
+<div class="row"><a class="b" href="#tours" data-i="c1"></a><a class="b o" href="#destinations" data-i="c2"></a></div>
+<form class="sr" id="hs" aria-label="Search tours">
+<label><span data-i="s1"></span><select id="hd"></select></label>
+<label><span data-i="s2"></span><input type="date" id="hdt"></label>
+<label><span data-i="s3"></span><input type="number" id="htr" min="1" max="20" value="2"></label>
+<label><span data-i="s4"></span><select id="hty"></select></label>
+<button class="b" data-i="s5"></button></form>
+</div></section>
+
+<section class="w"><p class="intro" data-i="intro"></p></section>
+
+<section class="w" id="destinations" style="padding-top:0"><h2 data-i="h1"></h2><div class="dg" id="dg"></div><div class="more"><button class="b o" id="dm"></button></div></section>
+
+<section class="w" id="tours" style="padding-top:0"><h2 data-i="h2"></h2><p class="mt" data-i="ill"></p><div class="fl" id="fl"></div><p id="cnt" class="mt" aria-live="polite"></p><div class="tgd" id="tg"></div></section>
+
+<section class="w" id="experiences" style="padding-top:0"><h2 data-i="h3"></h2><div class="ex" id="ex"></div></section>
+
+<section class="w" id="map" style="padding-top:0"><h2 data-i="h4"></h2><p class="mt" data-i="mnote"></p><div class="chips" id="chips"></div><div class="mapw"><div id="mapc"></div><div class="mc" id="mcard"></div></div></section>
+
+<section class="w" id="about" style="padding-top:0"><h2 data-i="h5"></h2><p class="intro" style="font-size:1.1rem;font-weight:400" data-i="ab"></p><div class="pr3"><div><h3 data-i="p1"></h3></div><div><h3 data-i="p2"></h3></div><div><h3 data-i="p3"></h3></div></div></section>
+
+<section class="w" id="faq" style="padding-top:0"><h2 data-i="h6"></h2>
+<details><summary data-i="q1"></summary><p data-i="a1"></p></details>
+<details><summary data-i="q2"></summary><p><span data-i="a2"></span> <a href="https://mfa.gov.kg" target="_blank" rel="noopener">mfa.gov.kg</a></p></details>
+<details><summary data-i="q3"></summary><p data-i="remote"></p></details></section>
+
+<section class="band" id="planner"><div class="w"><h2 data-i="h7"></h2><p class="mt" data-i="h7s"></p>
+<form class="pf" id="pf"><label><span data-i="pd"></span><input name="days" type="number" min="1" max="14" value="7"></label>
+<label><span data-i="pa"></span><select name="act" id="pact"></select></label>
+<label><span data-i="pbud"></span><input name="bud" type="number" min="100" step="50" value="700"></label>
+<label><span data-i="pm"></span><select name="mon" id="pmon"></select></label>
+<label><span data-i="f3"></span><select name="df" id="pdf"></select></label>
+<button class="b" data-i="pgo"></button></form><div id="pres" aria-live="polite"></div></div></section>
+</main>
+
+<footer id="footer"><div class="w">
+<div><strong>Travel Horizon</strong><p data-i="fd"></p><select class="lang" aria-label="Language"><option value="en">English</option><option value="ru">Русский</option><option value="ky">Кыргызча</option><option value="es">Español</option></select></div>
+<div><a href="#destinations" data-i="n1"></a><a href="#tours" data-i="n2"></a><a href="#faq" data-i="h6"></a></div>
+<div><small data-i="fc"></small><br><small data-i="fs"></small></div>
+<div><small data-i="fp"></small><br><small data-i="ft"></small><p><small data-i="fa"></small></p><small data-i="fr"></small></div>
+</div></footer>
+
+<dialog id="dlg" aria-label="Details"><button class="x" id="dx" aria-label="Close">✕</button><div id="dc"></div></dialog>
+
+<script>
+const LG=['en','ru','ky','es'];
+const T={
+en:{fc2:'Country of residence (where you live)',fcc:'Code',fph:'Phone (optional if email given)',fbu:'Budget per person (USD)',flg:'Language for our reply',fco:'I agree that my details are sent to Travel Horizon to answer this inquiry. Privacy policy: placeholder.',e_country:'Choose your country of residence.',e_contact:'Enter an email or a phone number.',e_phone:'Enter a valid phone number.',e_cc:'Enter a calling code such as +39.',e_consent:'Please accept the privacy notice.',info:'Information only — no tour yet',lg1:'Tours available',lg2:'Information only',bu0:'Not sure',sent:'Thank you! Your travel inquiry has been sent. Our team will contact you soon. Reference:',err:'We could not send your inquiry. Please try again in a moment.',n1:'Destinations',n2:'Tours',n3:'Experiences',n4:'About Us',n5:'Contact',plan:'Plan My Trip',tag:'Discover Kyrgyzstan. Feel the Freedom.',sub:'Journey beyond the ordinary — explore wild mountains, crystal-clear lakes, and the timeless traditions of the Silk Road.',c1:'Explore Tours',c2:'Discover Kyrgyzstan',s1:'Destination',s2:'Travel dates',s3:'Travelers',s4:'Experience',s5:'Search',any:'Any',intro:'From alpine lakes to Silk Road caravanserais — journeys built around Kyrgyzstan’s wild landscapes and living nomadic traditions.',h1:'Explore Kyrgyzstan',h2:'Tour packages',h3:'Experiences',h4:'Interactive map',h5:'Why Travel Horizon',h6:'Practical information',h7:'Plan your Kyrgyzstan journey',h7s:'Tell us what matters and we will match it against the tours above.',trek:'Trekking',nomad:'Nomad life',culture:'Culture',road:'Scenic roads',d_e:'Easy',d_m:'Moderate',d_h:'Challenging',days:'days',from:'from',pp:'per person',il:'illustrative',ill:'Illustrative prices — not confirmed supplier rates. Final price depends on group size, season, accommodation and optional activities. Seasons are indicative.',alld:'Explore all destinations',less:'Show fewer',disc:'Discover destination',f1:'Max budget',f2:'Max days',f3:'Difficulty',f4:'Type',f5:'Destination',f6:'Month',f7:'Sort',so0:'Default',so1:'Price: low to high',so2:'Duration: short to long',clr:'Clear filters',empty:'No tours match. Try widening your filters.',cnt:'tours found',view:'View tour',book:'Request booking',rt:'Route',seas:'Season',inc:'Typically included',incl:'Local guide, transport, accommodation, most meals.',exc:'Not included',excl:'International flights, visa, travel insurance, personal expenses, optional activities.',remote:'Remote areas: access, permits, road conditions and seasonal availability must be confirmed before travel.',rq:'Booking request',fn:'Name',fe:'Email',fdt:'Preferred date',ftr:'Travelers',fno:'Notes (optional)',frv:'Review request',fsd:'Send booking request',e_name:'Enter your name.',e_email:'Enter a valid email address.',e_date:'Choose a future date.',e_trav:'Enter 1–20 travelers.',ok:'Demo mode: your booking request was validated but not sent. No reservation or payment was made. Connect a backend in submitRequest().',reg:'Region',dur:'Recommended duration',act:'Activities',notes:'Altitude, weather and road access vary by season. Confirm conditions with your operator.',rel:'Related tours',norel:'No listed tour yet — ask through the trip planner.',vt:'See matching tours',req:'On request',hm:'Map of Kyrgyzstan',mnote:'Marker positions are approximate. Select a marker for details.',mh:'Select a marker on the map.',allr:'All regions',ab:'Travel Horizon is built around meaningful travel: local guides, authentic experiences and respect for Kyrgyzstan’s natural and cultural heritage.',p1:'Discover responsibly.',p2:'Travel deeper.',p3:'Connect with local culture.',q1:'When is the best time to visit?',a1:'June to September suits trekking, yurt camps and high passes. Winter suits skiing near Karakol. Mountain weather changes fast.',q2:'Do I need a visa?',a2:'Many nationalities enter visa-free or with an e-visa for a limited stay, but rules change. Check the official source before booking:',q3:'Are permits needed in remote areas?',pd:'Travel days',pa:'Activity',pbud:'Budget per person (USD)',pm:'Travel month',pgo:'Find tours',pnone:'No exact match. Closest alternatives — adjust the criteria shown in red:',pok:'Matching tours',fd:'Journeys across Kyrgyzstan’s mountains, lakes and Silk Road heritage.',fc:'Phone and email: [to be configured]',fs:'Social links: [to be added]',fp:'Privacy policy: placeholder',ft:'Terms: placeholder',fa:'Images are placeholder illustrations; licensed photography to be added.',fr:'© 2026 Travel Horizon'},
+ru:{sent:'Спасибо! Ваша заявка отправлена. Наша команда скоро свяжется с вами. Номер:',err:'Не удалось отправить заявку. Попробуйте ещё раз через минуту.',fc2:'Страна проживания (где вы живёте)',fcc:'Код',fph:'Телефон (необязательно при наличии email)',fbu:'Бюджет на человека (USD)',flg:'Язык ответа',fco:'Я согласен(на), что мои данные будут отправлены в Travel Horizon для ответа на запрос. Политика конфиденциальности: заглушка.',e_country:'Выберите страну проживания.',e_contact:'Укажите email или телефон.',e_phone:'Введите корректный телефон.',e_cc:'Укажите код страны, например +39.',e_consent:'Подтвердите согласие.',info:'Только информация — туров пока нет',lg1:'Есть туры',lg2:'Только информация',bu0:'Пока не знаю',n1:'Направления',n2:'Туры',n3:'Впечатления',n4:'О нас',n5:'Контакты',plan:'Спланировать поездку',tag:'Откройте Кыргызстан. Почувствуйте свободу.',sub:'Отправьтесь за пределы привычного: дикие горы, кристально чистые озёра и вековые традиции Шёлкового пути.',c1:'Смотреть туры',c2:'Узнать о Кыргызстане',s1:'Направление',s2:'Даты поездки',s3:'Путешественники',s4:'Тип',s5:'Найти',any:'Любой',intro:'От альпийских озёр до караван-сараев Шёлкового пути — маршруты о диких пейзажах и живых кочевых традициях Кыргызстана.',h1:'Откройте Кыргызстан',h2:'Туры',h3:'Впечатления',h4:'Интерактивная карта',h5:'Почему Travel Horizon',h6:'Практическая информация',h7:'Спланируйте поездку в Кыргызстан',h7s:'Укажите, что важно, и мы подберём туры из списка выше.',trek:'Треккинг',nomad:'Кочевая жизнь',culture:'Культура',road:'Живописные дороги',d_e:'Лёгкий',d_m:'Средний',d_h:'Сложный',days:'дн.',from:'от',pp:'с человека',il:'ориентировочно',ill:'Ориентировочные цены — не подтверждённые тарифы поставщиков. Итог зависит от размера группы, сезона, размещения и дополнительных опций. Сезоны указаны примерно.',alld:'Все направления',less:'Скрыть',disc:'Подробнее',f1:'Макс. бюджет',f2:'Макс. дней',f3:'Сложность',f4:'Тип',f5:'Направление',f6:'Месяц',f7:'Сортировка',so0:'По умолчанию',so1:'Цена: по возрастанию',so2:'Длительность: короткие',clr:'Сбросить фильтры',empty:'Нет подходящих туров. Расширьте фильтры.',cnt:'туров найдено',view:'Подробнее',book:'Запросить бронь',rt:'Маршрут',seas:'Сезон',inc:'Обычно включено',incl:'Местный гид, транспорт, проживание, большинство приёмов пищи.',exc:'Не включено',excl:'Международные перелёты, виза, страховка, личные расходы, дополнительные опции.',remote:'Отдалённые районы: доступ, разрешения, состояние дорог и сезонность нужно подтвердить до поездки.',rq:'Запрос на бронирование',fn:'Имя',fe:'Email',fdt:'Желаемая дата',ftr:'Путешественники',fno:'Пожелания (необязательно)',frv:'Проверить заявку',fsd:'Отправить запрос',e_name:'Введите имя.',e_email:'Введите корректный email.',e_date:'Выберите будущую дату.',e_trav:'Укажите от 1 до 20 человек.',ok:'Демо-режим: заявка проверена, но не отправлена. Бронирование и оплата не выполнены. Подключите бэкенд в submitRequest().',reg:'Регион',dur:'Рекомендуемая длительность',act:'Занятия',notes:'Высота, погода и доступность дорог зависят от сезона. Уточняйте условия у оператора.',rel:'Связанные туры',norel:'Подходящего тура пока нет — спросите через планировщик.',vt:'Подходящие туры',req:'По запросу',hm:'Карта Кыргызстана',mnote:'Положение маркеров приблизительное. Выберите маркер для подробностей.',mh:'Выберите маркер на карте.',allr:'Все регионы',ab:'Travel Horizon строится вокруг осмысленных путешествий: местные гиды, аутентичные впечатления и уважение к природному и культурному наследию Кыргызстана.',p1:'Открывайте ответственно.',p2:'Путешествуйте глубже.',p3:'Знакомьтесь с местной культурой.',q1:'Когда лучше ехать?',a1:'С июня по сентябрь — треккинг, юрточные лагеря и высокие перевалы. Зимой — лыжи у Каракола. Погода в горах быстро меняется.',q2:'Нужна ли виза?',a2:'Многие граждане въезжают без визы или по e-visa на ограниченный срок, но правила меняются. Проверьте официальный источник перед бронированием:',q3:'Нужны ли разрешения в отдалённых районах?',pd:'Дней в поездке',pa:'Занятие',pbud:'Бюджет на человека (USD)',pm:'Месяц поездки',pgo:'Подобрать туры',pnone:'Точных совпадений нет. Ближайшие варианты — измените критерии, выделенные красным:',pok:'Подходящие туры',fd:'Путешествия по горам, озёрам и наследию Шёлкового пути Кыргызстана.',fc:'Телефон и email: [будут настроены]',fs:'Соцсети: [будут добавлены]',fp:'Политика конфиденциальности: заглушка',ft:'Условия: заглушка',fa:'Изображения — иллюстрации-заглушки; лицензионные фото будут добавлены.',fr:'© 2026 Travel Horizon'},
+ky:{n1:'Багыттар',n2:'Турлар',n3:'Таасирлер',n4:'Биз жөнүндө',n5:'Байланыш',plan:'Саякатымды пландоо',tag:'Кыргызстанды ачыңыз. Эркиндикти сезиңиз.',sub:'Кадимкиден тышкары саякат: жапайы тоолор, тунук көлдөр жана Жибек жолунун кылымдык салттары.',c1:'Турларды көрүү',c2:'Кыргызстанды таануу',s1:'Багыт',s2:'Саякат күндөрү',s3:'Саякатчылар',s4:'Түрү',s5:'Издөө',any:'Каалаган',intro:'Тоо көлдөрүнөн Жибек жолунун керван-сарайларына чейин — Кыргызстандын жапайы жаратылышына жана тирүү көчмөн салттарына негизделген маршруттар.',h1:'Кыргызстанды изилдеңиз',h2:'Тур пакеттер',h3:'Таасирлер',h4:'Интерактивдүү карта',h5:'Эмне үчүн Travel Horizon',h6:'Пайдалуу маалымат',h7:'Кыргызстанга саякатты пландаңыз',h7s:'Эмне маанилүү экенин көрсөтүңүз, биз жогорудагы турлардан тандап беребиз.',trek:'Трекинг',nomad:'Көчмөн жашоо',culture:'Маданият',road:'Кооз жолдор',d_e:'Жеңил',d_m:'Орточо',d_h:'Татаал',days:'күн',from:'баштап',pp:'бир адамга',il:'үлгүлүү',ill:'Үлгүлүү баалар — жеткирүүчүлөрдүн ырасталган тарифи эмес. Акыркы баа топтун көлөмүнө, мезгилге, жайгашууга жана кошумча иш-чараларга жараша болот. Мезгилдер болжолдуу.',alld:'Бардык багыттар',less:'Азыраак көрсөтүү',disc:'Көбүрөөк билүү',f1:'Макс. бюджет',f2:'Макс. күн',f3:'Татаалдыгы',f4:'Түрү',f5:'Багыт',f6:'Ай',f7:'Иргетөө',so0:'Демейки',so1:'Баа: арзандан кымбатка',so2:'Узактыгы: кыскадан узунга',clr:'Чыпкаларды тазалоо',empty:'Тур табылган жок. Чыпкаларды кеңейтиңиз.',cnt:'тур табылды',view:'Көрүү',book:'Брондоо сурамы',rt:'Маршрут',seas:'Мезгил',inc:'Адатта кирет',incl:'Жергиликтүү гид, транспорт, жайгашуу, көпчүлүк тамак.',exc:'Кирбейт',excl:'Эл аралык учуу, виза, камсыздандыруу, жеке чыгымдар, кошумча иш-чаралар.',remote:'Алыскы аймактар: жетүү, уруксат, жолдун абалы жана мезгилдик жеткиликтүүлүк саякаттан мурун тактоону талап кылат.',rq:'Брондоо сурамы',fn:'Аты-жөнү',fe:'Email',fdt:'Каалаган дата',ftr:'Саякатчылар',fno:'Эскертүүлөр (милдеттүү эмес)',frv:'Сурамды текшерүү',fsd:'Сурамды жөнөтүү',e_name:'Атыңызды жазыңыз.',e_email:'Туура email жазыңыз.',e_date:'Келечектеги датаны тандаңыз.',e_trav:'1–20 саякатчы жазыңыз.',ok:'Демо режим: сурам текшерилди, бирок жөнөтүлгөн жок. Брондоо же төлөм жасалган жок. submitRequest() ичине бэкенд туташтырыңыз.',reg:'Аймак',dur:'Сунушталган узактык',act:'Иш-чаралар',notes:'Бийиктик, аба ырайы жана жолдун абалы мезгилге жараша өзгөрөт. Шарттарды оператор менен тактаңыз.',rel:'Байланыштуу турлар',norel:'Азырынча тур жок — пландоочу аркылуу сураңыз.',vt:'Тиешелүү турлар',req:'Суроо боюнча',hm:'Кыргызстандын картасы',mnote:'Маркерлердин орду болжолдуу. Кеңири маалымат үчүн маркерди тандаңыз.',mh:'Картадан маркерди тандаңыз.',allr:'Бардык аймактар',ab:'Travel Horizon мааниси терең саякатка негизделген: жергиликтүү гиддер, чыныгы таасирлер жана Кыргызстандын жаратылыш менен маданий мурасын сыйлоо.',p1:'Жоопкерчилик менен ачыңыз.',p2:'Тереңирээк саякаттаңыз.',p3:'Жергиликтүү маданият менен тааныңыз.',q1:'Качан барган жакшы?',a1:'Июндан сентябрга чейин — трекинг, боз үй лагерлери жана бийик ашуулар. Кышында Каракол жанында лыжа. Тоодогу аба ырайы тез өзгөрөт.',q2:'Виза керекпи?',a2:'Көптөгөн жарандар чектелген мөөнөткө визасыз же e-visa менен кире алат, бирок эрежелер өзгөрөт. Брондоодон мурун расмий булакты текшериңиз:',q3:'Алыскы аймактарга уруксат керекпи?',pd:'Саякат күндөрү',pa:'Иш-чара',pbud:'Бир адамга бюджет (USD)',pm:'Саякат айы',pgo:'Турларды табуу',pnone:'Так дал келүү жок. Эң жакын варианттар — кызыл менен белгиленген критерийлерди өзгөртүңүз:',pok:'Тиешелүү турлар',fd:'Кыргызстандын тоолору, көлдөрү жана Жибек жолу мурасы боюнча саякаттар.',fc:'Телефон жана email: [тууралана элек]',fs:'Социалдык тармактар: [кошулат]',fp:'Купуялуулук саясаты: убактылуу',ft:'Шарттар: убактылуу',fa:'Сүрөттөр — убактылуу иллюстрациялар; лицензиялуу сүрөттөр кошулат.',fr:'© 2026 Travel Horizon'},
+es:{n1:'Destinos',n2:'Tours',n3:'Experiencias',n4:'Nosotros',n5:'Contacto',plan:'Planifica mi viaje',tag:'Descubre Kirguistán. Siente la libertad.',sub:'Viaja más allá de lo común: montañas salvajes, lagos cristalinos y las tradiciones milenarias de la Ruta de la Seda.',c1:'Explorar tours',c2:'Descubrir Kirguistán',s1:'Destino',s2:'Fechas',s3:'Viajeros',s4:'Experiencia',s5:'Buscar',any:'Cualquiera',intro:'De lagos alpinos a caravasares de la Ruta de la Seda: viajes en torno a los paisajes salvajes y las tradiciones nómadas vivas de Kirguistán.',h1:'Explora Kirguistán',h2:'Paquetes de viaje',h3:'Experiencias',h4:'Mapa interactivo',h5:'Por qué Travel Horizon',h6:'Información práctica',h7:'Planifica tu viaje a Kirguistán',h7s:'Cuéntanos qué te importa y lo cruzaremos con los tours de arriba.',trek:'Senderismo',nomad:'Vida nómada',culture:'Cultura',road:'Rutas panorámicas',d_e:'Fácil',d_m:'Moderado',d_h:'Exigente',days:'días',from:'desde',pp:'por persona',il:'orientativo',ill:'Precios orientativos, no tarifas confirmadas de proveedores. El precio final depende del tamaño del grupo, la temporada, el alojamiento y las actividades opcionales. Las temporadas son indicativas.',alld:'Ver todos los destinos',less:'Ver menos',disc:'Descubrir destino',f1:'Presupuesto máx.',f2:'Días máx.',f3:'Dificultad',f4:'Tipo',f5:'Destino',f6:'Mes',f7:'Ordenar',so0:'Predeterminado',so1:'Precio: de menor a mayor',so2:'Duración: de menor a mayor',clr:'Borrar filtros',empty:'Ningún tour coincide. Amplía los filtros.',cnt:'tours encontrados',view:'Ver tour',book:'Solicitar reserva',rt:'Ruta',seas:'Temporada',inc:'Normalmente incluido',incl:'Guía local, transporte, alojamiento, la mayoría de las comidas.',exc:'No incluido',excl:'Vuelos internacionales, visado, seguro de viaje, gastos personales, actividades opcionales.',remote:'Zonas remotas: acceso, permisos, estado de las carreteras y disponibilidad estacional deben confirmarse antes del viaje.',rq:'Solicitud de reserva',fn:'Nombre',fe:'Email',fdt:'Fecha preferida',ftr:'Viajeros',fno:'Notas (opcional)',frv:'Revisar solicitud',fsd:'Enviar solicitud de reserva',e_name:'Introduce tu nombre.',e_email:'Introduce un email válido.',e_date:'Elige una fecha futura.',e_trav:'Introduce de 1 a 20 viajeros.',ok:'Modo demo: tu solicitud se validó pero no se envió. No se hizo ninguna reserva ni pago. Conecta un backend en submitRequest().',reg:'Región',dur:'Duración recomendada',act:'Actividades',notes:'La altitud, el clima y el acceso por carretera varían según la temporada. Confirma las condiciones con tu operador.',rel:'Tours relacionados',norel:'Aún no hay tour listado: consúltalo en el planificador.',vt:'Ver tours',req:'A consulta',hm:'Mapa de Kirguistán',mnote:'Las posiciones son aproximadas. Selecciona un marcador para ver detalles.',mh:'Selecciona un marcador en el mapa.',allr:'Todas las regiones',ab:'Travel Horizon se basa en viajar con sentido: guías locales, experiencias auténticas y respeto por el patrimonio natural y cultural de Kirguistán.',p1:'Descubre con responsabilidad.',p2:'Viaja más profundo.',p3:'Conecta con la cultura local.',q1:'¿Cuál es la mejor época para viajar?',a1:'De junio a septiembre es ideal para trekking, campamentos de yurtas y puertos altos. En invierno, esquí cerca de Karakol. El clima de montaña cambia rápido.',q2:'¿Necesito visado?',a2:'Muchas nacionalidades entran sin visado o con e-visa por estancias limitadas, pero las normas cambian. Consulta la fuente oficial antes de reservar:',q3:'¿Hacen falta permisos en zonas remotas?',pd:'Días de viaje',pa:'Actividad',pbud:'Presupuesto por persona (USD)',pm:'Mes de viaje',pgo:'Buscar tours',pnone:'Sin coincidencia exacta. Alternativas más cercanas: ajusta los criterios marcados en rojo:',pok:'Tours que encajan',fd:'Viajes por las montañas, lagos y el patrimonio de la Ruta de la Seda en Kirguistán.',fc:'Teléfono y email: [por configurar]',fs:'Redes sociales: [por añadir]',fp:'Política de privacidad: marcador',ft:'Términos: marcador',fa:'Las imágenes son ilustraciones provisionales; se añadirá fotografía con licencia.',fr:'© 2026 Travel Horizon'}};
+const R={ik:'Issyk-Kul|Иссык-Кульская обл.|Ысык-Көл облусу|Issyk-Kul',na:'Naryn|Нарынская обл.|Нарын облусу|Naryn',ch:'Chüy|Чуйская обл.|Чүй облусу|Chüy',so:'South|Юг|Түштүк|Sur'};
+const D=[['ik','Issyk-Kul|Иссык-Куль|Ысык-Көл|Issyk-Kul',42.45,77.25,'ik',190,'2–4',[6,9],['road','culture'],'Turquoise water, beaches and lakeside villages.|Бирюзовая вода, пляжи и прибрежные сёла.|Ак көгүлтүр суу, пляждар жана жээктеги айылдар.|Aguas turquesa, playas y pueblos ribereños.'],
+['sk','Song-Kul|Сон-Куль|Сөн-Көл|Song-Kul',41.8,75.15,'na',95,'2–3',[6,9],['nomad','trek'],'Alpine pastures, yurts, horses and nomadic life.|Альпийские луга, юрты, лошади и жизнь кочевников.|Тоо жайлоолору, боз үйлөр, аттар жана көчмөн жашоо.|Pastos alpinos, yurtas, caballos y vida nómada.'],
+['ks','Kel-Suu|Кель-Суу|Кел-Суу|Kel-Suu',40.85,78.3,'na',175,'3',[7,9],['trek','road'],'A remote lake beneath towering cliffs.|Отдалённое озеро под высокими скалами.|Бийик аскалардын түбүндөгү алыскы көл.|Un lago remoto bajo imponentes acantilados.'],
+['aa','Ala-Archa|Ала-Арча|Ала-Арча|Ala-Archa',42.57,74.49,'ch',150,'1–2',[6,9],['trek'],'Glaciers, trails, waterfalls and peaks near Bishkek.|Ледники, тропы, водопады и вершины недалеко от Бишкека.|Бишкектин жанындагы мөңгүлөр, жолдор жана чокулар.|Glaciares, senderos, cascadas y cumbres cerca de Biskek.'],
+['ak','Ala-Kul|Ала-Куль|Ала-Көл|Ala-Kul',42.37,78.55,'ik',185,'3–4',[7,9],['trek'],'A turquoise alpine lake reached by a rewarding trek.|Бирюзовое высокогорное озеро, до которого ведёт треккинг.|Трекинг менен жетилүүчү тоодогу ак көгүлтүр көл.|Un lago alpino turquesa al que se llega con trekking.'],
+['jo','Jeti-Oguz|Джеты-Огуз|Жети-Өгүз|Jeti-Oguz',42.33,78.19,'ik',15,'1',[5,9],['trek'],'Red sandstone cliffs and forested valleys.|Красные песчаники и лесистые долины.|Кызыл кумташ аскалар жана токойлуу өрөөндөр.|Acantilados de arenisca roja y valles boscosos.'],
+['sc','Skazka Canyon|Каньон Сказка|Жомок каньону|Cañón Skazka',42.15,77,'ik',20,'1',[5,9],['road'],'Extraordinary red rock formations near Issyk-Kul.|Необычные красные скалы близ Иссык-Куля.|Ысык-Көлдүн жанындагы кызыктай кызыл аскалар.|Formaciones de roca roja junto al Issyk-Kul.'],
+['kr','Karakol|Каракол|Каракол|Karakol',42.49,78.39,'ik',210,'2–3',[1,12],['trek','culture'],'Mountain adventures, local food and trekking access.|Горные приключения, местная кухня и старт треков.|Тоо укмуштуулары, жергиликтүү тамак жана трекингдин башталышы.|Aventura de montaña, gastronomía local y base de trekking.'],
+['tr','Tash-Rabat|Таш-Рабат|Таш-Рабат|Tash-Rabat',40.83,75.28,'na',35,'1–2',[6,9],['culture'],'A Silk Road caravanserai in a remote valley.|Караван-сарай Шёлкового пути в отдалённой долине.|Алыскы өрөөндөгү Жибек жолунун керван-сарайы.|Un caravasar de la Ruta de la Seda en un valle remoto.'],
+['bu','Burana Tower|Башня Бурана|Бурана мунарасы|Torre Burana',42.74,75.25,'ch',45,'½–1',[4,10],['culture'],'An ancient minaret and Silk Road landmark.|Древний минарет и памятник Шёлкового пути.|Байыркы минарет, Жибек жолунун эстелиги.|Un antiguo minarete y hito de la Ruta de la Seda.'],
+['os','Osh|Ош|Ош|Osh',40.53,72.8,'so',25,'2',[4,10],['culture'],'Sulaiman-Too, traditional bazaars and mountain views.|Сулайман-Тоо, традиционные базары и горные виды.|Сулайман-Тоо, салттуу базарлар жана тоо көрүнүштөрү.|Sulaimán-Too, bazares tradicionales y vistas de montaña.'],
+['ar','Arslanbob|Арсланбоб|Арстанбап|Arslanbob',41.33,72.95,'so',120,'2',[5,10],['trek','culture'],'Walnut forests, waterfalls and village life.|Ореховые леса, водопады и деревенский быт.|Жаңгак токойлору, шаркыратмалар жана айыл жашоосу.|Bosques de nogales, cascadas y vida rural.'],
+['al','Alay Valley|Алайская долина|Алай өрөөнү|Valle de Alay',39.65,72.9,'so',140,'2–3',[6,9],['trek','road'],'A vast high valley facing the Pamir peaks.|Огромная высокогорная долина напротив пиков Памира.|Памир чокуларына каратылган кең бийик өрөөн.|Un vasto valle de altura frente a las cumbres del Pamir.'],
+['sch','Sary-Chelek|Сары-Челек|Сары-Челек|Sary-Chelek',41.83,71.95,'so',130,'2',[5,9],['trek'],'A forest lake in a protected biosphere reserve.|Лесное озеро в биосферном заповеднике.|Биосфералык коруктагы токойлуу көл.|Un lago entre bosques en una reserva de la biosfera.']]
+.map((a,i)=>({id:a[0],n:a[1],la:a[2],lo:a[3],rg:a[4],h:a[5],du:a[6],m:a[7],a:a[8],ds:a[9],i:i+1}));
+/* Central tour data: edit prices/routes here. Prices are illustrative. */
+const TR=[['t1','Kyrgyzstan Highlights|Главное в Кыргызстане|Кыргызстандын көрүнүктүү жерлери|Lo mejor de Kirguistán',7,690,'e',['culture','road'],'Bishkek · Ala-Archa · Issyk-Kul · Karakol',['aa','ik','kr'],[5,10],0],
+['t2','The Nomad Experience|Жизнь кочевников|Көчмөндөр жашоосу|La experiencia nómada',3,295,'e',['nomad'],'Bishkek · Kochkor · Song-Kul',['sk'],[6,9],0],
+['t3','Alpine Lakes Adventure|Приключение у горных озёр|Тоо көлдөрүндөгү укмуштуу окуя|Aventura en lagos alpinos',4,475,'h',['trek'],'Karakol · Ala-Kul · Altyn-Arashan',['kr','ak'],[7,9],0],
+['t4','Issyk-Kul & Song-Kul Discovery|Иссык-Куль и Сон-Куль|Ысык-Көл жана Сөн-Көл|Descubre Issyk-Kul y Song-Kul',3,370,'e',['nomad','road'],'Issyk-Kul · Mountain passes · Song-Kul',['ik','sk'],[6,9],0],
+['t5','Kel-Suu Expedition|Экспедиция на Кель-Суу|Кел-Суу экспедициясы|Expedición a Kel-Suu',3,600,'m',['road','trek'],'Naryn · Remote valleys · Kel-Suu',['ks'],[7,9],1],
+['t6','Silk Road Heritage|Наследие Шёлкового пути|Жибек жолу мурасы|Patrimonio de la Ruta de la Seda',5,450,'e',['culture'],'Bishkek · Burana Tower · Tash-Rabat · Naryn',['bu','tr'],[5,10],0],
+['t7','The Southern Discovery|Открытие юга|Түштүктү ачуу|Descubrimiento del sur',6,650,'m',['culture','road'],'Osh · Sulaiman-Too · Alay Valley · Villages',['os','ar','al'],[5,10],1],
+['t8','Kyrgyzstan Grand Adventure|Большое приключение|Улуу укмуштуу окуя|Gran aventura por Kirguistán',10,1190,'m',['trek','nomad','culture'],'Bishkek · Ala-Archa · Issyk-Kul · Karakol · Song-Kul · Naryn',['aa','ik','kr','sk'],[6,9],0]]
+.map(a=>({id:a[0],n:a[1],d:a[2],p:a[3],df:a[4],ty:a[5],r:a[6],ds:a[7],m:a[8],rm:a[9]}));
+const EX=[['trek','Mountain trekking|Горный треккинг|Тоо трекинги|Trekking de montaña',185,'trek'],['horse','Horseback riding|Конные прогулки|Ат минүү|Paseos a caballo',95,'nomad'],['yurt','Yurt stays|Ночёвка в юрте|Боз үйдө түнөө|Noches en yurta',110,'nomad'],['photo','Photography & road trips|Фото и дорожные путешествия|Фото жана жол саякаты|Fotografía y rutas',20,'road'],['cult','Nomadic culture & cuisine|Кочевая культура и кухня|Көчмөн маданияты жана ашкана|Cultura nómada y gastronomía',40,'culture'],['ski','Skiing & winter|Лыжи и зима|Лыжа жана кыш|Esquí e invierno',205,'']];
+
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let L='en';try{L=localStorage.getItem('thl')||'en'}catch(e){}
+if(!T[L])L='en';
+const t=k=>T[L][k]??T.en[k],pk=s=>s.split('|')[LG.indexOf(L)];
+const mn=m=>new Intl.DateTimeFormat(L,{month:'long'}).format(new Date(2026,m-1,15));
+const usd=n=>'$'+n.toLocaleString('en-US');
+const dflt=()=>({bud:1200,dur:10,df:'',ty:'',ds:'',mo:0,so:''});
+let F=dflt(),showAll=false,mreg='',sel='',uid=0,PT=2,PD='';
+
+let mty='',hl=[],LM,LG2;
+function sc(h,s,lbl,yurt){const r=n=>{const x=Math.sin(s*97.3+n*13.7)*1e4;return x-Math.floor(x)},id='g'+(uid++);
+const P=(b,a,c,o)=>{let q='0,300';for(let i=0;i<=8;i++)q+=` ${i*100},${(b-r(o+i)*a).toFixed(0)}`;return `<polygon points="${q} 800,300" fill="${c}"/>`};
+return `<svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${lbl}"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(${h},60%,68%)"/><stop offset="1" stop-color="#F8F6F0"/></linearGradient></defs><rect width="800" height="300" fill="url(#${id})"/>${P(200,130,'#f4f7f8',1)}${P(225,90,`hsl(${h},18%,62%)`,11)}${P(250,45,'#4f7d67',21)}<rect y="250" width="800" height="50" fill="#25a39b"/>${P(290,35,'#173D32',31)}${yurt?'<path d="M600 280a28 26 0 0156 0z" fill="#fff"/><path d="M620 280a8 12 0 0116 0z" fill="#8a6b3f"/>':''}</svg>`}
+
+function applyI18n(){document.documentElement.lang=L;$$('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));$$('.lang').forEach(s=>s.value=L)}
+function fill(el,opts,anyKey){const p=el.value;el.innerHTML=(anyKey?`<option value="">${t('any')}</option>`:'')+opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');el.value=p;if(el.value!==p)el.selectedIndex=0}
+const TY=['trek','nomad','culture','road'];
+const IMG={}; // optional: {ik:'https://…jpg'} — licensed photo URLs; the illustration is the fallback
+const pic=d=>sc(d.h,d.i,pk(d.n))+(IMG[d.id]?`<img src="${IMG[d.id]}" alt="${pk(d.n)}" loading="lazy" onerror="this.remove()">`:'');
+const CC={US:1,CA:1,MX:52,BR:55,AR:54,CL:56,CO:57,PE:51,GB:44,IE:353,FR:33,DE:49,IT:39,ES:34,PT:351,NL:31,BE:32,CH:41,AT:43,SE:46,NO:47,DK:45,FI:358,PL:48,CZ:420,GR:30,TR:90,UA:380,KZ:7,RU:7,UZ:998,KG:996,TJ:992,TM:993,BY:375,GE:995,AM:374,AZ:994,CN:86,JP:81,KR:82,IN:91,SG:65,TH:66,VN:84,MY:60,ID:62,PH:63,AU:61,NZ:64,AE:971,SA:966,IL:972,EG:20,ZA:27,HK:852,TW:886};
+const BU=['','<500','500-1000','1000-1500','1500-2500','2500+'];
+const cname=c=>{try{return new Intl.DisplayNames([L],{type:'region'}).of(c)}catch(e){return c}};
+const CL=()=>Object.keys(CC).map(c=>`<option value="${cname(c)}">`).join('');
+function selects(){
+fill($('#hd'),D.map(d=>[d.id,pk(d.n)]),1);fill($('#hty'),TY.map(k=>[k,t(k)]),1);
+fill($('#pact'),TY.map(k=>[k,t(k)]),1);fill($('#pdf'),['e','m','h'].map(k=>[k,t('d_'+k)]),1);
+const ms=[...Array(12)].map((_,i)=>[i+1,mn(i+1)]);fill($('#pmon'),ms);if(!$('#pmon').dataset.s){$('#pmon').value=7;$('#pmon').dataset.s=1}}
+
+const dcard=d=>`<article class="c" data-d="${d.id}"><div class="im">${pic(d)}</div><div class="cb"><small class="mt">${pk(R[d.rg])} · ${d.du} ${t('days')}</small><h3>${pk(d.n)}</h3><p>${pk(d.ds)}</p><div class="tg">${d.a.map(a=>`<span>${t(a)}</span>`).join('')}</div><div class="row"><button class="b o" data-d="${d.id}">${t('disc')}</button></div></div></article>`;
+function dests(){$('#dg').innerHTML=(showAll?D:D.slice(0,6)).map(dcard).join('');$('#dm').textContent=showAll?t('less'):t('alld')}
+
+function filters(){
+const o=(id,lab,opts,v,any)=>`<label>${lab}<select id="${id}">${(any?`<option value="">${t('any')}</option>`:'')+opts.map(x=>`<option value="${x[0]}"${String(x[0])==String(v)?' selected':''}>${x[1]}</option>`).join('')}</select></label>`;
+$('#fl').innerHTML=`<label>${t('f1')}: <b id="bv">${usd(F.bud)}</b><input type="range" id="fb" min="250" max="1200" step="50" value="${F.bud}"></label>
+<label>${t('f2')}: <b id="dv">${F.dur}</b><input type="range" id="fd" min="3" max="10" value="${F.dur}"></label>
+${o('fdf',t('f3'),['e','m','h'].map(k=>[k,t('d_'+k)]),F.df,1)}${o('fty',t('f4'),TY.map(k=>[k,t(k)]),F.ty,1)}${o('fds',t('f5'),D.map(d=>[d.id,pk(d.n)]),F.ds,1)}${o('fmo',t('f6'),[...Array(12)].map((_,i)=>[i+1,mn(i+1)]),F.mo||'',1)}
+${o('fso',t('f7'),[['p',t('so1')],['d',t('so2')]],F.so)}<button class="b o" id="clr">${t('clr')}</button>`;$('#fso').insertAdjacentHTML('afterbegin',`<option value="">${t('so0')}</option>`);$('#fso').value=F.so}
+const tcard=x=>{const d0=D.find(d=>d.id==x.ds[0]);return `<article class="c"><div class="im">${pic(d0)}<span class="pill">${x.d} ${t('days')}</span></div><div class="cb"><h3>${pk(x.n)}</h3><p class="mt">${x.r}</p><div class="tg">${x.ty.map(y=>`<span>${t(y)}</span>`).join('')}<span>${t('d_'+x.df)}</span></div><p>${t('from')} <b>${usd(x.p)}</b> ${t('pp')} <small class="mt">(${t('il')})</small></p><div class="row"><button class="b o" data-t="${x.id}">${t('view')}</button><button class="b" data-t="${x.id}" data-f="1">${t('book')}</button></div></div></article>`};
+function grid(){let l=TR.filter(x=>x.p<=F.bud&&x.d<=F.dur&&(!F.df||x.df==F.df)&&(!F.ty||x.ty.includes(F.ty))&&(!F.ds||x.ds.includes(F.ds))&&(!F.mo||(F.mo>=x.m[0]&&F.mo<=x.m[1])));
+if(F.so=='p')l.sort((a,b)=>a.p-b.p);if(F.so=='d')l.sort((a,b)=>a.d-b.d);
+$('#cnt').textContent=`${l.length} ${t('cnt')}`;
+$('#tg').innerHTML=l.length?l.map(tcard).join(''):`<div class="empty"><p>${t('empty')}</p><button class="b" id="clr2">${t('clr')}</button></div>`}
+function exps(){$('#ex').innerHTML=EX.map((e,i)=>`<button data-x="${e[4]}" data-k="${e[0]}" aria-label="${pk(e[1])}">${sc(e[2],i+40,pk(e[1]),e[0]=='yurt')}<span>${pk(e[1])}${e[4]?'':` · ${t('req')}`}</span></button>`).join('')}
+
+function svgMap(){const X=lo=>((lo-69.5)/11*800).toFixed(0),Y=la=>((43.5-la)/4.5*435).toFixed(0);
+$('#chips').innerHTML=['',...Object.keys(R)].map(k=>`<button class="b${mreg==k?'':' o'}" data-rg="${k}">${k?pk(R[k]):t('allr')}</button>`).join('');
+$('#mapc').innerHTML=`<svg viewBox="0 0 800 435" role="group" aria-label="${t('hm')}" style="width:100%;height:auto"><rect class="mbg" width="800" height="435" rx="16"/>${[40,41,42,43].map(l=>`<line class="gl" x1="0" x2="800" y1="${Y(l)}" y2="${Y(l)}"/>`).join('')}<ellipse class="lk" cx="${X(77.25)}" cy="${Y(42.45)}" rx="72" ry="19"/>${D.filter(d=>(!mreg||d.rg==mreg)&&(!mty||d.a.includes(mty))).map(d=>`<g class="mk" tabindex="0" role="button" aria-label="${pk(d.n)}" data-mk="${d.id}" transform="translate(${X(d.lo)} ${Y(d.la)})"><circle r="20"/><circle r="8" class="${d.id==sel?'on':''}"/><title>${pk(d.n)}</title></g>`).join('')}</svg>`;
+const d=D.find(x=>x.id==sel&&(!mreg||x.rg==mreg));
+$('#mcard').innerHTML=d?`<div class="im" style="height:150px">${sc(d.h,d.i,pk(d.n))}</div><div class="cb"><h3>${pk(d.n)}</h3><p>${pk(d.ds)}</p><div class="row"><button class="b" data-ft="${d.id}">${t('vt')}</button><button class="b o" data-d="${d.id}">${t('disc')}</button></div></div>`:`<div class="cb"><p class="mt">${t('mh')}</p></div>`}
+
+function chips(){$('#chips').innerHTML=['',...Object.keys(R)].map(k=>`<button class="b${mreg==k?'':' o'}" data-rg="${k}">${k?pk(R[k]):t('allr')}</button>`).join('')+' '+['',...TY].map(k=>`<button class="b${mty==k?'':' o'}" data-ty="${k}">${k?t(k):t('any')}</button>`).join('')+`<span class="mt"><b style="color:#173D32">●</b> ${t('lg1')} · <b style="color:#c9a24b">●</b> ${t('lg2')}</span>`}
+function mcard(){const d=D.find(x=>x.id==sel);if(!d){$('#mcard').innerHTML=`<div class="cb"><p class="mt">${t('mh')}</p></div>`;return}
+const tr=TR.filter(x=>x.ds.includes(d.id));
+$('#mcard').innerHTML=`<div class="im" style="height:150px">${pic(d)}</div><div class="cb"><h3>${pk(d.n)}</h3><p>${pk(d.ds)}</p>${tr.length?tr.map(x=>`<p><button class="b o" data-t="${x.id}">${pk(x.n)}</button> ${x.d} ${t('days')} · ${t('from')} ${usd(x.p)}</p>`).join(''):`<p class="mt">${t('info')}</p>`}</div>`}
+function lmap(){const el=$('#mapc');
+if(!LM){el.style.height='440px';LM=L.map(el,{scrollWheelZoom:false}).setView([41.5,74.6],6);
+const tl=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(LM);
+let er=0;tl.on('tileerror',()=>{if(++er==3)el.style.background='var(--mb)'});LG2=L.layerGroup().addTo(LM)}
+LG2.clearLayers();
+D.filter(d=>(!mreg||d.rg==mreg)&&(!mty||d.a.includes(mty))).forEach(d=>{const has=TR.some(x=>x.ds.includes(d.id)),hi=hl.includes(d.id);
+L.circleMarker([d.la,d.lo],{radius:hi?12:8,color:hi?'#c0572b':'#fff',weight:hi?3:2,fillColor:has?'#173D32':'#c9a24b',fillOpacity:1}).on('click',()=>{sel=d.id;mcard()}).bindTooltip(pk(d.n)).addTo(LG2)});
+mcard();setTimeout(()=>LM.invalidateSize(),50)}
+function map(){if(!window.L){svgMap();chips();return}chips();lmap()}
+function render(){applyI18n();selects();dests();filters();grid();exps();map();$('#hbg').innerHTML=sc(195,7,'Kyrgyzstan landscape illustration',1);$('title').textContent=`Travel Horizon — ${t('tag')}`}
+const dlg=$('#dlg'),open=()=>{if(!dlg.open)dlg.showModal()};
+function openDest(id){const d=D.find(x=>x.id==id),rel=TR.filter(x=>x.ds.includes(id));
+$('#dc').innerHTML=`<div class="im" style="height:260px">${pic(d)}</div><div class="dp"><h2>${pk(d.n)}</h2><p>${pk(d.ds)}</p><ul class="kv"><li>${t('reg')}: ${pk(R[d.rg])}</li><li>${t('dur')}: ${d.du} ${t('days')}</li><li>${t('seas')}: ${mn(d.m[0])}–${mn(d.m[1])}</li><li>${t('act')}: ${d.a.map(t).join(', ')}</li></ul><p class="mt">${t('notes')}</p><h3>${t('rel')}</h3>${rel.length?`<div class="row">${rel.map(x=>`<button class="b o" data-t="${x.id}">${pk(x.n)}</button>`).join('')}</div>`:`<p>${t('norel')}</p>`}</div>`;open()}
+function openTour(id,f){hl=(TR.find(y=>y.id==id)||{ds:[]}).ds;if(LM)lmap();const x=TR.find(y=>y.id==id),d0=D.find(d=>d.id==x.ds[0]),mind=new Date(Date.now()+864e5).toISOString().slice(0,10);
+$('#dc').innerHTML=`<div class="im" style="height:230px">${pic(d0)}</div><div class="dp"><h2>${pk(x.n)}</h2><p>${x.d} ${t('days')} · ${t('d_'+x.df)} · ${t('from')} <b>${usd(x.p)}</b> ${t('pp')} (${t('il')})</p><h3>${t('rt')}</h3><ol>${x.r.split(' · ').map(s=>`<li>${s}</li>`).join('')}</ol><p>${t('seas')}: ${mn(x.m[0])}–${mn(x.m[1])}</p><p class="mt">${t('ill')}</p>${x.rm?`<p class="warn">${t('remote')}</p>`:''}<div class="two"><div><h3>${t('inc')}</h3><p>${t('incl')}</p></div><div><h3>${t('exc')}</h3><p>${t('excl')}</p></div></div>
+<h3 id="rq">${t('rq')}</h3><form id="bf" novalidate data-id="${x.id}"><div class="fg"><label>${t('fn')}<input name="name" autocomplete="name"><em data-e="name"></em></label><label>${t('fe')}<input name="email" type="email" autocomplete="email"><em data-e="email"></em></label><label>${t('fc2')}<input name="country" list="cl" autocomplete="off"><em data-e="country"></em></label><div class="row" style="flex-wrap:nowrap;align-items:flex-start"><label style="width:96px">${t('fcc')}<input name="cc" placeholder="+"></label><label style="flex:1">${t('fph')}<input name="phone" type="tel" autocomplete="tel-national"><em data-e="contact"></em></label></div><label>${t('flg')}<select name="lg">${LG.map(l=>`<option value="${l}"${l==L?' selected':''}>${l.toUpperCase()}</option>`).join('')}</select></label><label>${t('fbu')}<select name="budget">${BU.map(b=>`<option value="${b}">${b?'$'+b:t('bu0')}</option>`).join('')}</select></label><label>${t('fdt')}<input name="date" type="date" min="${mind}" value="${PD>=mind?PD:''}"><em data-e="date"></em></label><label>${t('ftr')}<input name="trav" type="number" min="1" max="20" value="${PT}"><em data-e="trav"></em></label></div><label style="margin:12px 0">${t('fno')}<textarea name="notes" rows="2"></textarea></label><label style="flex-direction:row;gap:8px;align-items:flex-start;font-weight:400;margin-bottom:6px"><input type="checkbox" name="consent" style="width:auto;margin-top:4px">${t('fco')}</label><em data-e="consent"></em><datalist id="cl">${CL()}</datalist><p id="sm" class="mt" hidden></p><button class="b" id="fb2">${t('frv')}</button><p id="res" role="status"></p></form></div>`;open();if(f)setTimeout(()=>$('#rq').scrollIntoView(),50)}
+/* Integration point: replace with fetch() to Supabase / email service / CRM. */
+async function submitRequest(p){const r=await fetch('/api/booking',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw j;return j}
+let KEY=crypto.randomUUID();
+dlg.addEventListener('input',e=>{const f=e.target.form;if(f&&f.id=='bf'&&f.dataset.r){delete f.dataset.r;$('#sm').hidden=true;$('#fb2').textContent=t('frv')}});
+dlg.addEventListener('submit',async e=>{e.preventDefault();const f=e.target;if(f.id!='bf')return;const v=Object.fromEntries(new FormData(f)),er={},x=TR.find(y=>y.id==f.dataset.id);
+if(!v.name.trim())er.name='e_name';if(!v.country.trim())er.country='e_country';const ph=v.phone.trim(),em=v.email.trim();if(!em&&!ph)er.contact='e_contact';else{if(em&&!/^\S+@\S+\.\S+$/.test(em))er.email='e_email';if(ph&&!/^[0-9 ()\-]{5,15}$/.test(ph))er.contact='e_phone';if(ph&&!/^\+\d{1,4}$/.test(v.cc.trim()))er.contact='e_cc'}if(!f.elements.consent.checked)er.consent='e_consent';if(!v.date||new Date(v.date)<=new Date())er.date='e_date';const n=+v.trav;if(!(n>=1&&n<=20))er.trav='e_trav';
+f.querySelectorAll('[data-e]').forEach(m=>m.textContent=er[m.dataset.e]?t(er[m.dataset.e]):'');
+const ks=Object.keys(er);if(ks.length){(f.elements[ks[0]]||f.elements.phone).focus();return}
+if(!f.dataset.r){f.dataset.r=1;const s=$('#sm');s.hidden=false;s.textContent=`${pk(x.n)} · ${v.name} · ${v.email} · ${v.date} · ${n} ${t('ftr')} · ${t('from')} ${usd(x.p*n)} (${t('il')})`;$('#fb2').textContent=t('fsd');return}
+const bt=$('#fb2');bt.disabled=true;try{const j=await submitRequest({...v,consent:true,lang:v.lg||L,tour:x.id,key:KEY});$('#res').textContent=`${t('sent')} ${j.ref}`;bt.hidden=true;KEY=crypto.randomUUID()}catch(err){$('#res').textContent=t('err');bt.disabled=false}});
+dlg.addEventListener('input',e=>{const n=e.target.name;if(n=='cc')e.target.dataset.m=1;if(n=='country'){const c=Object.keys(CC).find(k=>cname(k)==e.target.value),cc=e.target.form.elements.cc;if(c&&!cc.dataset.m)cc.value='+'+CC[c]}});
+$('#dx').onclick=()=>dlg.close();dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+const go=s=>$(s).scrollIntoView();
+document.addEventListener('click',e=>{const a=e.target.closest('[data-t],[data-d],[data-x],[data-mk],[data-rg],[data-ty],[data-ft],#dm,#clr,#clr2,#bg,#nv a');if(!a)return;
+if(a.id=='bg'){const o=$('#nv').classList.toggle('open');a.setAttribute('aria-expanded',o);return}
+if(a.closest('#nv')){$('#nv').classList.remove('open');return}
+if(a.id=='dm'){showAll=!showAll;dests();return}
+if(a.id=='clr'||a.id=='clr2'){F=dflt();filters();grid();return}
+if(a.dataset.t){openTour(a.dataset.t,a.dataset.f);return}
+if(a.dataset.d){openDest(a.dataset.d);return}
+if(a.dataset.x!==undefined){if(!a.dataset.x){go('#planner');return}F=dflt();F.ty=a.dataset.x;filters();grid();go('#tours');return}
+if(a.dataset.mk){sel=a.dataset.mk;map();const g=$(`[data-mk="${sel}"]`);if(g)g.focus();return}
+if(a.dataset.ty!==undefined){mty=a.dataset.ty;map();return}
+if(a.dataset.rg!==undefined){mreg=a.dataset.rg;map();return}
+if(a.dataset.ft){dlg.close();F=dflt();F.ds=a.dataset.ft;filters();grid();go('#tours')}});
+document.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.dataset&&e.target.dataset.mk){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
+$('#fl').addEventListener('input',e=>{const m={fb:['bud',Number],fd:['dur',Number],fdf:['df',String],fty:['ty',String],fds:['ds',String],fmo:['mo',Number],fso:['so',String]}[e.target.id];if(!m)return;F[m[0]]=m[1](e.target.value);$('#bv').textContent=usd(F.bud);$('#dv').textContent=F.dur;grid()});
+$$('.lang').forEach(s=>s.addEventListener('change',e=>{L=e.target.value;try{localStorage.setItem('thl',L)}catch(x){}render()}));
+$('#hs').addEventListener('submit',e=>{e.preventDefault();F=dflt();F.ds=$('#hd').value;F.ty=$('#hty').value;PD=$('#hdt').value;PT=Math.min(20,Math.max(1,+$('#htr').value||2));if(PD)F.mo=new Date(PD+'T12:00').getMonth()+1;filters();grid();go('#tours')});
+$('#hdt').min=new Date().toISOString().slice(0,10);
+$('#pf').addEventListener('submit',e=>{e.preventDefault();const f=e.target,q=+f.days.value,bd=+f.bud.value,ac=f.act.value,mo=+f.mon.value,df=f.df.value;
+const s=TR.map(x=>{const b=[];if(x.d>q)b.push('pd');if(x.p>bd)b.push('pbud');if(ac&&!x.ty.includes(ac))b.push('pa');if(mo<x.m[0]||mo>x.m[1])b.push('pm');if(df&&x.df!=df)b.push('f3');return{x,b}});
+const ok=s.filter(z=>!z.b.length),l=ok.length?ok:s.sort((a,b)=>a.b.length-b.b.length).slice(0,3);
+$('#pres').innerHTML=`<p style="margin-top:16px"><b>${ok.length?t('pok'):t('pnone')}</b></p>`+l.map(z=>`<div class="pres"><span><b>${pk(z.x.n)}</b> · ${z.x.d} ${t('days')} · ${usd(z.x.p)} ${z.b.map(k=>`<span class="bad">${t(k)}</span>`).join(' ')}</span><button type="button" class="b o" data-t="${z.x.id}">${t('view')}</button></div>`).join('')});
+render();
+</script>
+</body>
+</html>
