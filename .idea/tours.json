@@ -1,0 +1,178 @@
+[
+  {
+    "id": "t1",
+    "n": "Kyrgyzstan Highlights|Главное в Кыргызстане|Кыргызстандын көрүнүктүү жерлери|Lo mejor de Kirguistán|I grandi classici del Kirghizistan|Les incontournables du Kirghizistan",
+    "d": 7,
+    "p": 690,
+    "df": "e",
+    "ty": [
+      "culture",
+      "road"
+    ],
+    "r": "Bishkek · Ala-Archa · Issyk-Kul · Karakol",
+    "ds": [
+      "aa",
+      "ik",
+      "kr",
+      "bk"
+    ],
+    "m": [
+      5,
+      10
+    ],
+    "rm": 0
+  },
+  {
+    "id": "t2",
+    "n": "The Nomad Experience|Жизнь кочевников|Көчмөндөр жашоосу|La experiencia nómada|L’esperienza nomade|L’expérience nomade",
+    "d": 3,
+    "p": 295,
+    "df": "e",
+    "ty": [
+      "nomad"
+    ],
+    "r": "Bishkek · Kochkor · Song-Kul",
+    "ds": [
+      "sk",
+      "bk"
+    ],
+    "m": [
+      6,
+      9
+    ],
+    "rm": 0
+  },
+  {
+    "id": "t3",
+    "n": "Alpine Lakes Adventure|Приключение у горных озёр|Тоо көлдөрүндөгү укмуштуу окуя|Aventura en lagos alpinos|Avventura sui laghi alpini|Aventure aux lacs alpins",
+    "d": 4,
+    "p": 475,
+    "df": "h",
+    "ty": [
+      "trek"
+    ],
+    "r": "Karakol · Ala-Kul · Altyn-Arashan",
+    "ds": [
+      "kr",
+      "ak"
+    ],
+    "m": [
+      7,
+      9
+    ],
+    "rm": 0
+  },
+  {
+    "id": "t4",
+    "n": "Issyk-Kul & Song-Kul Discovery|Иссык-Куль и Сон-Куль|Ысык-Көл жана Сөн-Көл|Descubre Issyk-Kul y Song-Kul|Scoprire Issyk-Kul e Song-Kul|Découverte d’Issyk-Koul et de Song-Kol",
+    "d": 3,
+    "p": 370,
+    "df": "e",
+    "ty": [
+      "nomad",
+      "road"
+    ],
+    "r": "Issyk-Kul · Mountain passes · Song-Kul",
+    "ds": [
+      "ik",
+      "sk"
+    ],
+    "m": [
+      6,
+      9
+    ],
+    "rm": 0
+  },
+  {
+    "id": "t5",
+    "n": "Kel-Suu Expedition|Экспедиция на Кель-Суу|Кел-Суу экспедициясы|Expedición a Kel-Suu|Spedizione a Kel-Suu|Expédition à Kel-Suu",
+    "d": 3,
+    "p": 600,
+    "df": "m",
+    "ty": [
+      "road",
+      "trek"
+    ],
+    "r": "Naryn · Remote valleys · Kel-Suu",
+    "ds": [
+      "ks",
+      "nr"
+    ],
+    "m": [
+      7,
+      9
+    ],
+    "rm": 1
+  },
+  {
+    "id": "t6",
+    "n": "Silk Road Heritage|Наследие Шёлкового пути|Жибек жолу мурасы|Patrimonio de la Ruta de la Seda|Patrimonio della Via della Seta|Patrimoine de la route de la Soie",
+    "d": 5,
+    "p": 450,
+    "df": "e",
+    "ty": [
+      "culture"
+    ],
+    "r": "Bishkek · Burana Tower · Tash-Rabat · Naryn",
+    "ds": [
+      "bu",
+      "tr",
+      "bk",
+      "nr"
+    ],
+    "m": [
+      5,
+      10
+    ],
+    "rm": 0
+  },
+  {
+    "id": "t7",
+    "n": "The Southern Discovery|Открытие юга|Түштүктү ачуу|Descubrimiento del sur|Alla scoperta del sud|Découverte du sud",
+    "d": 6,
+    "p": 650,
+    "df": "m",
+    "ty": [
+      "culture",
+      "road"
+    ],
+    "r": "Osh · Sulaiman-Too · Alay Valley · Villages",
+    "ds": [
+      "os",
+      "ar",
+      "al",
+      "st"
+    ],
+    "m": [
+      5,
+      10
+    ],
+    "rm": 1
+  },
+  {
+    "id": "t8",
+    "n": "Kyrgyzstan Grand Adventure|Большое приключение|Улуу укмуштуу окуя|Gran aventura por Kirguistán|Grande avventura in Kirghizistan|Grande aventure au Kirghizistan",
+    "d": 10,
+    "p": 1190,
+    "df": "m",
+    "ty": [
+      "trek",
+      "nomad",
+      "culture"
+    ],
+    "r": "Bishkek · Ala-Archa · Issyk-Kul · Karakol · Song-Kul · Naryn",
+    "ds": [
+      "aa",
+      "ik",
+      "kr",
+      "sk",
+      "bk",
+      "nr"
+    ],
+    "m": [
+      6,
+      9
+    ],
+    "rm": 0
+  }
+]
