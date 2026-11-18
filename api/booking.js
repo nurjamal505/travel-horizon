@@ -35,19 +35,22 @@ module.exports = async (req,res) => {
  if(done.has(v.key))return out(200,{ok:true,ref:done.get(v.key)});
  const ref='TH-'+new Date().getUTCFullYear()+'-'+crypto.randomBytes(4).toString('hex').toUpperCase();
  const message=['<b>NEW TRAVEL HORIZON INQUIRY</b>','',`Reference: <code>${ref}</code>`,'',`Name: ${esc(v.name)}`,`Country: ${esc(v.country)}`,v.phone?`Phone: ${esc(v.cc+' '+v.phone)}`:null,v.email?`Email: ${esc(v.email)}`:null,`Language: ${LANGS[v.lang]}`,'',`Tour: ${esc(TOURS[v.tour])}`,`Date: ${v.date}`,`Travelers: ${v.trav}`,v.budget?`Budget/person: $${esc(v.budget)}`:null,v.notes?`Notes: ${esc(v.notes)}`:null,'Source: Travel Horizon'].filter(Boolean).join('\n');
+ // Save to the database before notification, so an outage does not erase the inquiry.
+ let stored=false;
+ if(process.env.SUPABASE_URL&&process.env.SUPABASE_SERVICE_ROLE_KEY){
+  try{
+   const sb=String(process.env.SUPABASE_URL).replace(/\\/$/,'');
+   const sr=await fetch(sb+'/rest/v1/bookings?on_conflict=idempotency_key',{method:'POST',headers:{apikey:process.env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+process.env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json',Prefer:'resolution=ignore-duplicates,return=minimal'},body:JSON.stringify({name:v.name,country:v.country,email:v.email,phone:v.phone?(v.cc+' '+v.phone):null,tour:TOURS[v.tour],date:v.date,travelers:v.trav,budget:v.budget,language:LANGS[v.lang],notes:v.notes,status:'new',telegram_ref:ref,idempotency_key:v.key})});
+   if(!sr.ok){console.error('supabase_insert_failed',sr.status);return out(503,{ok:false,error:'storage_failed'});}
+   stored=true;
+  }catch(dbErr){console.error('supabase_insert_error',dbErr.name);return out(503,{ok:false,error:'storage_failed'});}
+ }
  const ac=new AbortController(),timer=setTimeout(()=>ac.abort(),8000);
  try{
   const r=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},signal:ac.signal,body:JSON.stringify({chat_id:chat,text:message,parse_mode:'HTML',disable_web_page_preview:true})});
   const j=await r.json().catch(()=>({}));
-  if(!r.ok||!j.ok){console.error('Telegram delivery rejected',r.status);return out(502,{ok:false,error:'delivery_failed'});}
-  // Persist the request when Supabase is configured. Telegram delivery remains available without a database.
-  if(process.env.SUPABASE_URL&&process.env.SUPABASE_SERVICE_ROLE_KEY){
-   try{
-    const sr=await fetch(String(process.env.SUPABASE_URL).replace(/\\/$/, '')+'/rest/v1/bookings',{method:'POST',headers:{apikey:process.env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+process.env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({name:v.name,country:v.country,email:v.email,phone:v.phone? v.cc+' '+v.phone:null,tour:TOURS[v.tour],date:v.date,travelers:v.trav,budget:v.budget,language:LANGS[v.lang],notes:v.notes,status:'new',telegram_ref:ref})});
-    if(!sr.ok)console.error('Supabase booking insert failed',sr.status);
-   }catch(dbErr){console.error('Supabase booking insert error',dbErr.name);}
-  }
+  if(!r.ok||!j.ok){console.error('Telegram delivery rejected',r.status);return out(502,{ok:false,error:'delivery_failed',saved:stored});}
   done.set(v.key,ref);if(done.size>2000)done.clear();return out(200,{ok:true,ref});
- }catch(err){console.error('Telegram delivery error',err.name);return out(504,{ok:false,error:'delivery_failed'});}
+ }catch(err){console.error('Telegram delivery error',err.name);return out(504,{ok:false,error:'delivery_failed',saved:stored});}
  finally{clearTimeout(timer);}
 };
