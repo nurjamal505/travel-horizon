@@ -18,6 +18,14 @@ module.exports=async(req,res)=>{
  try{
   const admins=await request('/rest/v1/admins?user_id=eq.'+encodeURIComponent(user.id)+'&select=user_id');
   if(!admins.length)return out(403,{ok:false,error:'not_admin'});
+  if(req.method==='POST'&&req.query.action==='telegram-test'){
+   const bot=process.env.TELEGRAM_BOT_TOKEN,chat=process.env.TELEGRAM_CHAT_ID;
+   if(!bot||!chat)return out(503,{ok:false,error:'telegram_not_configured'});
+   const tg=await fetch('https://api.telegram.org/bot'+bot+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:chat,text:'Travel Horizon: test message. Telegram connection is working.'})});
+   const tj=await tg.json().catch(()=>({}));
+   if(!tg.ok||!tj.ok){console.error('telegram_test_failed',tg.status,tj.error_code);return out(502,{ok:false,error:'telegram_delivery_failed',telegram_code:tj.error_code||null});}
+   return out(200,{ok:true});
+  }
   if(req.method==='GET'&&req.query.action==='bookings'){
    const rows=await request('/rest/v1/bookings?select=*&order=created_at.desc&limit=200');return out(200,{ok:true,bookings:rows});
   }
