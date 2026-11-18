@@ -39,7 +39,7 @@ module.exports = async (req,res) => {
  let stored=false;
  if(process.env.SUPABASE_URL&&process.env.SUPABASE_SERVICE_ROLE_KEY){
   try{
-   const sb=String(process.env.SUPABASE_URL).replace(/\\/$/,'');
+   const raw=String(process.env.SUPABASE_URL); const sb=raw.endsWith('/')?raw.slice(0,-1):raw;
    const sr=await fetch(sb+'/rest/v1/bookings?on_conflict=idempotency_key',{method:'POST',headers:{apikey:process.env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+process.env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json',Prefer:'resolution=ignore-duplicates,return=minimal'},body:JSON.stringify({name:v.name,country:v.country,email:v.email,phone:v.phone?(v.cc+' '+v.phone):null,tour:TOURS[v.tour],date:v.date,travelers:v.trav,budget:v.budget,language:LANGS[v.lang],notes:v.notes,status:'new',telegram_ref:ref,idempotency_key:v.key})});
    if(!sr.ok){console.error('supabase_insert_failed',sr.status);return out(503,{ok:false,error:'storage_failed'});}
    stored=true;
