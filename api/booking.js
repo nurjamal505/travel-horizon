@@ -12,7 +12,6 @@ module.exports = async (req,res) => {
  const out=(s,b)=>res.status(s).json(b);
  if(req.method!=='POST')return out(405,{ok:false,error:'method'});
  const token=process.env.TELEGRAM_BOT_TOKEN,chat=process.env.TELEGRAM_CHAT_ID;
- if(!token||!chat)return out(503,{ok:false,error:'not_configured'});
  const b=req.body&&typeof req.body==='object'?req.body:{};
  if(b.website)return out(200,{ok:true,ref:'TH-0'});
  const ip=String(req.headers['x-forwarded-for']||'').split(',')[0].trim()||'unknown';
@@ -45,6 +44,7 @@ module.exports = async (req,res) => {
    stored=true;
   }catch(dbErr){console.error('supabase_insert_error',dbErr.name);return out(503,{ok:false,error:'storage_failed'});}
  }
+ if(!token||!chat)return out(503,{ok:false,error:'not_configured',saved:stored});
  const ac=new AbortController(),timer=setTimeout(()=>ac.abort(),8000);
  try{
   const r=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},signal:ac.signal,body:JSON.stringify({chat_id:chat,text:message,parse_mode:'HTML',disable_web_page_preview:true})});
