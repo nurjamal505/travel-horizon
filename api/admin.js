@@ -4,7 +4,9 @@ const anon=()=>process.env.SUPABASE_ANON_KEY;
 const service=()=>process.env.SUPABASE_SERVICE_ROLE_KEY;
 async function request(path,options={}){const r=await fetch(base()+path,{...options,headers:{apikey:service(),Authorization:'Bearer '+service(),'Content-Type':'application/json',...(options.headers||{})}});const body=await r.json().catch(()=>({}));if(!r.ok)throw new Error(body.message||body.error||'Supabase request failed');return body;}
 module.exports=async(req,res)=>{
- res.setHeader('Cache-Control','no-store');const out=(s,b)=>res.status(s).json(b);
+ res.setHeader('Cache-Control','no-store');
+ res.setHeader('X-Content-Type-Options','nosniff');
+ res.setHeader('Referrer-Policy','no-referrer');const out=(s,b)=>res.status(s).json(b);
  if(!base()||!anon()||!service())return out(503,{ok:false,error:'admin_not_configured'});
  if(req.method==='POST'&&req.query.action==='login'){
   const {email,password}=req.body||{};if(typeof email!=='string'||typeof password!=='string')return out(400,{ok:false});
