@@ -44,7 +44,7 @@ module.exports = async (req,res) => {
    stored=true;
   }catch(dbErr){console.error('supabase_insert_error',dbErr.name);return out(503,{ok:false,error:'storage_failed'});}
  }
- if(!token||!chat)return out(503,{ok:false,error:'not_configured',saved:stored});
+ if(!token||!chat){if(stored){done.set(v.key,ref);return out(200,{ok:true,ref,saved:true,notified:false,warning:'telegram_not_configured'});}return out(503,{ok:false,error:'not_configured',saved:false});}
  const ac=new AbortController(),timer=setTimeout(()=>ac.abort(),8000);
  try{
   const r=await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},signal:ac.signal,body:JSON.stringify({chat_id:chat,text:message,parse_mode:'HTML',disable_web_page_preview:true})});
