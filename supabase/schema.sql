@@ -15,4 +15,4 @@ alter table public.bookings enable row level security;
 
 -- Safe upgrade for projects that created the table before idempotency support.
 alter table public.bookings add column if not exists idempotency_key text;
-create unique index if not exists bookings_idempotency_key_uidx on public.bookings(idempotency_key) where idempotency_key is not null;
+create unique index if not exists bookings_idempotency_key_uidx on public.bookings(idempotency_key);
