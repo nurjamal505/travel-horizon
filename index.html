@@ -195,7 +195,22 @@ return `<svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" role="im
 function applyI18n(){document.documentElement.lang=L;$$('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));$$('.lang').forEach(s=>s.value=L)}
 function fill(el,opts,anyKey){const p=el.value;el.innerHTML=(anyKey?`<option value="">${t('any')}</option>`:'')+opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');el.value=p;if(el.value!==p)el.selectedIndex=0}
 const TY=['trek','nomad','culture','road'];
-const IMG={}; // optional: {ik:'https://…jpg'} — licensed photo URLs; the illustration is the fallback
+const IMG={}; // Licensed Wikimedia Commons photos; SVG illustrations remain the fallback.
+let photoLoadStarted=false;
+async function hydratePhotos(){
+ if(photoLoadStarted)return;photoLoadStarted=true;
+ const allowed=/^(CC0|CC BY|CC BY-SA|Public domain)/i;
+ await Promise.all(D.map(async d=>{
+  try{
+   const q=encodeURIComponent(pk(d.n).split('|')[0]+' Kyrgyzstan');
+   const u='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=8&gsrsearch='+q+'&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=1000';
+   const r=await fetch(u);if(!r.ok)return;const j=await r.json();
+   const pages=Object.values(j.query?.pages||{});
+   const best=pages.find(p=>{const m=p.imageinfo?.[0]?.extmetadata||{};return p.imageinfo?.[0]?.thumburl&&allowed.test(m.LicenseShortName?.value||m.UsageTerms?.value||'')});
+   if(best){IMG[d.id]=best.imageinfo[0].thumburl;const card=document.querySelector('[data-d="'+d.id+'"] .im');if(card&&!card.querySelector('img')){const im=document.createElement('img');im.src=IMG[d.id];im.alt=pk(d.n);im.loading='lazy';im.referrerPolicy='no-referrer';im.onerror=()=>im.remove();card.appendChild(im)}}
+  }catch(e){console.warn('Commons photo lookup skipped',d.id)}
+ }));
+}
 const pic=d=>sc(d.h,d.i,pk(d.n))+(IMG[d.id]?`<img src="${IMG[d.id]}" alt="${pk(d.n)}" loading="lazy" onerror="this.remove()">`:'');
 const CC={US:1,CA:1,MX:52,BR:55,AR:54,CL:56,CO:57,PE:51,GB:44,IE:353,FR:33,DE:49,IT:39,ES:34,PT:351,NL:31,BE:32,CH:41,AT:43,SE:46,NO:47,DK:45,FI:358,PL:48,CZ:420,GR:30,TR:90,UA:380,KZ:7,RU:7,UZ:998,KG:996,TJ:992,TM:993,BY:375,GE:995,AM:374,AZ:994,CN:86,JP:81,KR:82,IN:91,SG:65,TH:66,VN:84,MY:60,ID:62,PH:63,AU:61,NZ:64,AE:971,SA:966,IL:972,EG:20,ZA:27,HK:852,TW:886};
 const BU=['','<500','500-1000','1000-1500','1500-2500','2500+'];
@@ -258,7 +273,7 @@ D.filter(d=>(!mreg||d.rg==mreg)&&(!mty||d.a.includes(mty))).forEach(d=>{const ha
 L.circleMarker([d.la,d.lo],{radius:hi?12:8,color:hi?'#c0572b':'#fff',weight:hi?3:2,fillColor:has?'#173D32':'#c9a24b',fillOpacity:1}).on('click',()=>{sel=d.id;mcard()}).bindTooltip(pk(d.n)).addTo(LG2)});
 mcard();setTimeout(()=>LM.invalidateSize(),50)}
 function map(){if(!window.L){svgMap();chips();return}chips();lmap()}
-function render(){applyI18n();selects();dests();filters();grid();exps();map();$('#hbg').innerHTML=sc(195,7,'Kyrgyzstan landscape illustration',1);$('title').textContent=`Travel Horizon — ${t('tag')}`}
+function render(){applyI18n();selects();dests();filters();grid();exps();map();$('#hbg').innerHTML=sc(195,7,'Kyrgyzstan landscape illustration',1);$('title').textContent=`Travel Horizon — ${t('tag')}`;hydratePhotos()}
 const dlg=$('#dlg'),open=()=>{if(!dlg.open)dlg.showModal()};
 function openDest(id){const d=D.find(x=>x.id==id),rel=TR.filter(x=>x.ds.includes(id));
 $('#dc').innerHTML=`<div class="im" style="height:260px">${pic(d)}</div><div class="dp"><h2>${pk(d.n)}</h2><p>${pk(d.ds)}</p><ul class="kv"><li>${t('reg')}: ${pk(R[d.rg])}</li><li>${t('dur')}: ${d.du} ${t('days')}</li><li>${t('seas')}: ${mn(d.m[0])}–${mn(d.m[1])}</li><li>${t('act')}: ${d.a.map(t).join(', ')}</li></ul><p class="mt">${t('notes')}</p><h3>${t('rel')}</h3>${rel.length?`<div class="row">${rel.map(x=>`<button class="b o" data-t="${x.id}">${pk(x.n)}</button>`).join('')}</div>`:`<p>${t('norel')}</p>`}</div>`;open()}
