@@ -85,6 +85,12 @@ dialog{max-width:860px;width:calc(100% - 24px);max-height:92vh;border:0;border-r
 em{color:#b3361b;font-style:normal;font-size:.78rem;min-height:1em}
 .warn{background:#fff3d6;color:#5b4300;border-radius:10px;padding:10px 14px}
 .kv{padding-left:18px}.leaflet-container{font:inherit;border-radius:16px;z-index:0}.im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* Compact persistent language switcher */
+.lang-dock{position:fixed;z-index:40;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--ln);border-radius:999px;background:color-mix(in srgb,var(--cd) 94%,transparent);box-shadow:0 5px 24px rgba(0,0,0,.18);backdrop-filter:blur(12px)}
+.lang-dock span{font-size:.72rem;font-weight:800;color:var(--mt)}
+.lang-dock select{width:auto;min-width:82px;border:0;background:transparent;padding:4px 8px;font-weight:800}
+body{padding-bottom:64px}
 </style>
 </head>
 <body>
@@ -95,6 +101,7 @@ em{color:#b3361b;font-style:normal;font-size:.78rem;min-height:1em}
 <select class="lang" aria-label="Language"><option value="en">EN</option><option value="ru">RU</option><option value="ky">KY</option><option value="es">ES</option></select></nav>
 <a class="b" href="#planner" data-i="plan"></a>
 </div></header>
+<div class="lang-dock" aria-label="Choose language"><span>LANGUAGE</span><select class="lang" aria-label="Choose site language"><option value="en">English</option><option value="ru">Русский</option><option value="ky">Кыргызча</option><option value="es">Español</option></select></div>
 <main id="top">
 <section class="hero"><div class="bgi" id="hbg"></div><div class="in">
 <h1 data-i="tag"></h1><p class="sb" data-i="sub"></p>
@@ -282,6 +289,29 @@ const s=TR.map(x=>{const b=[];if(x.d>q)b.push('pd');if(x.p>bd)b.push('pbud');if(
 const ok=s.filter(z=>!z.b.length),l=ok.length?ok:s.sort((a,b)=>a.b.length-b.b.length).slice(0,3);
 $('#pres').innerHTML=`<p style="margin-top:16px"><b>${ok.length?t('pok'):t('pnone')}</b></p>`+l.map(z=>`<div class="pres"><span><b>${pk(z.x.n)}</b> · ${z.x.d} ${t('days')} · ${usd(z.x.p)} ${z.b.map(k=>`<span class="bad">${t(k)}</span>`).join(' ')}</span><button type="button" class="b o" data-t="${z.x.id}">${t('view')}</button></div>`).join('')});
 render();
+
+/* Automatic destination photography from Wikimedia Commons.
+   Results are loaded at runtime; source links and license metadata are kept in image titles. */
+async function loadCommonsPhotos(){
+ const jobs=D.map(async d=>{
+  try{
+   const q=encodeURIComponent(pk(d.n).split('|')[0]+' Kyrgyzstan');
+   const url='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+q+'&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=1000&format=json&origin=*';
+   const res=await fetch(url);if(!res.ok)return;
+   const data=await res.json(),pages=Object.values(data.query?.pages||{});
+   const p=pages.find(x=>/\.(jpg|jpeg|png|webp)$/i.test(x.title||'')&&x.imageinfo?.[0]?.thumburl);
+   if(!p)return;
+   const info=p.imageinfo[0],meta=info.extmetadata||{};
+   IMG[d.id]=info.thumburl;
+   const credit=[meta.Artist?.value,meta.LicenseShortName?.value].filter(Boolean).join(' · ');
+   IMG[d.id+'__credit']=(p.title||'Wikimedia Commons')+' | '+credit+' | https://commons.wikimedia.org/wiki/'+encodeURIComponent(p.title||'');
+  }catch(e){/* Illustration fallback remains available when Commons is unreachable. */}
+ });
+ await Promise.allSettled(jobs);
+ dests();grid();exps();if(typeof LM!=='undefined'&&LM)lmap();else map();
+}
+
+loadCommonsPhotos();
 </script>
 </body>
 </html>
