@@ -1,23 +1,47 @@
 # Travel Horizon
 
-Статический сайт `public/index.html` + серверная функция `api/booking.js` (заявки → Telegram).
+Сайт публикуется из корня репозитория через Vercel. Основные части:
+- `index.html` — публичный сайт (EN/RU/KY/ES), интерактивная карта, автоматическая загрузка фото Wikimedia Commons.
+- `api/booking.js` — проверка заявок, отправка в Telegram и необязательное сохранение в Supabase.
+- `admin/index.html` + `api/admin.js` — защищённая панель заявок: `/admin/`.
+- `supabase/schema.sql` — таблицы для базы данных.
 
-## Локальный запуск
-`npm i -g vercel`, затем `vercel dev`. Создайте локальный `.env` по образцу `.env.example` (он в `.gitignore`, не коммитить).
+## Vercel
 
-## Публикация (GitHub → Vercel)
-1. Создайте пустой репозиторий на GitHub и выполните в папке проекта:
-   `git init && git add . && git commit -m "feat: Travel Horizon" && git branch -M main && git remote add origin URL && git push -u origin main`
-2. Vercel → **Add New → Project** → выберите репозиторий. Сборка не нужна, `vercel.json` указывает папку `public`.
-3. Добавьте переменные (`docs/TELEGRAM_SETUP.md`), сделайте Redeploy. Далее push в `main` = production, другие ветки = preview.
+Добавьте переменные в Settings → Environment Variables:
 
-## Как менять содержимое (всё в `public/index.html`)
-- **Туры, цены, маршруты:** массив `TR` (цена — 5-е поле каждого тура). Цены демонстрационные.
-- **Направления и координаты карты:** массив `D`. Карта строится из `D` и `TR`, расхождений быть не должно.
-- **Фотографии:** объект `IMG`, например `IMG.ik='https://…/issyk-kul.jpg'`. Используйте снимки с лицензией (Wikimedia Commons, Unsplash) и указывайте авторов. Без URL показывается иллюстрация.
-- **Переводы:** объект `T`.
-- **Список туров на сервере:** `TOURS` в `api/booking.js` должен совпадать с `TR`.
+| Переменная | Назначение |
+|---|---|
+| `TELEGRAM_BOT_TOKEN` | Секретный токен Telegram-бота |
+| `TELEGRAM_CHAT_ID` | ID чата, куда приходят заявки |
+| `SUPABASE_URL` | URL проекта Supabase |
+| `SUPABASE_ANON_KEY` | Публичный ключ Supabase для проверки пользовательской сессии |
+| `SUPABASE_SERVICE_ROLE_KEY` | Секретный service role key, только серверная переменная |
 
-## Ограничения
-- Лимит запросов и защита от дублей хранятся в памяти экземпляра функции. Для строгой защиты подключите Upstash Redis или Vercel KV.
-- Переведены 4 языка (EN, RU, KY, ES); IT, ZH, JA, FR не добавлены.
+После добавления переменных сделайте Redeploy. Не помещайте токены и service role key в HTML, JavaScript браузера или GitHub.
+
+## Настройка базы и администратора
+
+1. Создайте проект Supabase.
+2. В SQL Editor выполните `supabase/schema.sql`.
+3. В Supabase Authentication → Users создайте пользователя администратора с email и паролем.
+4. Скопируйте UUID пользователя и выполните SQL, заменив UUID:
+
+```sql
+insert into public.admins (user_id) values ('UUID-ПОЛЬЗОВАТЕЛЯ');
+```
+
+5. Добавьте переменные Supabase в Vercel и выполните Redeploy.
+6. Откройте `https://ВАШ-ДОМЕН/admin/` и войдите созданным email и паролем.
+
+Админ API проверяет JWT через Supabase Auth и сверяет UUID пользователя с таблицей `admins`. Таблицы не открыты для анонимного доступа. Service role key используется только сервером.
+
+## Локальная разработка
+
+Установите Node.js и Vercel CLI, затем выполните `vercel dev`. Локальные секреты держите в `.env.local`, не коммитьте их.
+
+## Фото и карта
+
+Фотографии ищутся по названиям мест в Wikimedia Commons во время загрузки сайта. Это зависит от доступности Commons и качества результатов; если фото не найдено, показывается встроенная иллюстрация. Карта использует Leaflet/OpenStreetMap и загружает административные границы из geoBoundaries. Позиции туристических маркеров ориентировочные.
+
+Цены в каталоге являются демонстрационными и не подтверждают наличие туров.
