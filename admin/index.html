@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="color-scheme" content="light dark">
+    <title>Travel Horizon — Admin</title>
+    <style>
+        :root{--g:#173D32;--g2:#0f2a22;--gold:#c9a24b;--sand:#DCC9A8;--bg:#f4f2ec;--card:#fff;--fg:#202521;--mt:#5a625d;--ln:#e4dfd2;--inp:#fbfaf6;--err:#b3361b;--ok:#1b6b3a;--sh:0 8px 30px rgba(23,61,50,.10)}
+        @media(prefers-color-scheme:dark){:root{--bg:#101612;--card:#1a221d;--fg:#eee9dc;--mt:#a7b0a9;--ln:#2d3a33;--inp:#141b17;--err:#ff8a73;--ok:#6fd49a;--sh:0 8px 30px rgba(0,0,0,.4)}}
+        *{box-sizing:border-box}[hidden]{display:none!important}
+        body{margin:0;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh}
+        :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+        @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+        /* top bar */
+        .top{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;position:sticky;top:0;z-index:20;box-shadow:0 2px 14px rgba(0,0,0,.25)}
+        .top .in{max-width:900px;margin:auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+        .brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+        .brand svg{flex:none}.brand h1{margin:0;font-size:1.1rem;font-weight:700;letter-spacing:.01em}
+        #al{display:flex;gap:4px;background:rgba(255,255,255,.12);padding:3px;border-radius:99px}
+        #al::before{content:"UI";font-size:.7rem;font-weight:700;opacity:.75;padding:0 8px 0 10px;align-self:center;letter-spacing:.06em}
+        #al button{border:0;background:transparent;color:#fff;border-radius:99px;padding:5px 13px;font:600 .8rem inherit;cursor:pointer;transition:background .2s}
+        #al button[aria-pressed="true"]{background:var(--sand);color:var(--g)}
+        #al button:hover:not([aria-pressed="true"]){background:rgba(255,255,255,.18)}
+
+        .w{max-width:900px;margin:auto;padding:26px 20px 120px}
+
+        /* login */
+        #login{max-width:400px;margin:9vh auto 0;background:var(--card);border-radius:22px;padding:34px 30px;box-shadow:var(--sh);text-align:center;border-top:5px solid var(--gold)}
+        #login .ico{width:64px;height:64px;border-radius:50%;background:var(--g);display:grid;place-items:center;margin:0 auto 18px}
+        #login label{text-align:left}
+        #login .row{justify-content:center}
+        #login #in{width:100%;padding:12px}
+
+        /* forms */
+        label{display:block;font-size:.82rem;font-weight:600;color:var(--mt);margin:14px 0 5px;text-transform:uppercase;letter-spacing:.04em}
+        input,textarea,select{font:inherit;width:100%;padding:11px 13px;border:1.5px solid var(--ln);border-radius:12px;background:var(--inp);color:var(--fg);transition:border-color .2s,box-shadow .2s}
+        input:hover,textarea:hover{border-color:#c7bfa8}
+        input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(201,162,75,.2);outline:none}
+        textarea{min-height:84px;resize:vertical}
+        input[type=file]{padding:8px;font-size:.88rem;cursor:pointer}
+        input[type=file]::file-selector-button{border:0;background:var(--g);color:#fff;border-radius:99px;padding:7px 16px;margin-right:12px;font-weight:600;cursor:pointer}
+        input[type=file]::file-selector-button:hover{background:var(--g2)}
+
+        button{font:inherit;font-weight:600;border:0;border-radius:99px;padding:10px 22px;background:var(--g);color:#fff;cursor:pointer;transition:transform .15s,box-shadow .15s,background .2s}
+        button:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(23,61,50,.3)}
+        button:disabled{opacity:.6;cursor:wait;transform:none}
+        button.o{background:var(--card);color:var(--fg);border:1.5px solid var(--ln);box-shadow:none}
+        button.o:hover{border-color:var(--gold);box-shadow:none}
+        button.o[aria-pressed="true"]{background:var(--g);color:#fff;border-color:var(--g)}
+        .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+
+        /* editor */
+        .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+        #tabs{display:flex;gap:6px;margin:0;background:var(--card);padding:5px;border-radius:99px;box-shadow:var(--sh)}
+        #tabs button{padding:8px 24px}
+        #stats{background:var(--card);border-radius:16px;padding:14px 20px;margin:16px 0;box-shadow:var(--sh);border-left:5px solid var(--gold);color:var(--mt);font-weight:600}
+        #form{background:var(--card);border-radius:20px;padding:6px 28px 30px;box-shadow:var(--sh)}
+        #form h2{font-size:1.15rem;margin:30px 0 4px;padding-bottom:8px;border-bottom:2px solid var(--gold);display:flex;align-items:center;gap:10px}
+        #form h2::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--gold)}
+        #form .card{background:var(--bg);border:1px solid var(--ln);border-radius:16px;padding:6px 20px 18px;margin:16px 0}
+        #form .card>b{display:inline-block;background:var(--g);color:#fff;border-radius:99px;padding:2px 14px;margin-top:14px;font-size:.85rem}
+
+        /* sticky save bar */
+        .w:has(#ed[hidden])~.save{display:none}
+        .save{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--ln);z-index:15}
+        .save .in{max-width:900px;margin:auto;padding:12px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+        #save{padding:12px 34px;background:linear-gradient(135deg,var(--g),#24604f)}
+        .msg{font-weight:600;font-size:.92rem;min-height:1.4em}.err{color:var(--err)}.ok{color:var(--ok)}
+        .hint{color:var(--mt);font-size:.85rem}
+
+        @media(max-width:600px){#form{padding:4px 16px 22px}#login{margin-top:4vh;padding:28px 20px}#tabs button{padding:8px 16px}}
+    </style>
+</head>
+<body>
+<header class="top"><div class="in">
+    <div class="brand">
+        <svg width="34" height="26" viewBox="0 0 34 26" aria-hidden="true"><path d="M0 26 12 5l6 10 4-6 12 17z" fill="#DCC9A8"/><circle cx="26" cy="5" r="3" fill="#c9a24b"/></svg>
+        <h1 id="ttl"></h1>
+    </div>
+    <div id="al" role="group" aria-label="Language"></div>
+</div></header>
+
+<main class="w">
+    <section id="login" aria-labelledby="lpw">
+        <div class="ico" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DCC9A8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+        <label for="pw" id="lpw"></label>
+        <input id="pw" type="password" autocomplete="current-password">
+        <div class="row"><button id="in"></button></div>
+        <div class="msg err" id="lm" role="alert"></div>
+    </section>
+
+    <section id="ed" hidden>
+        <div class="bar">
+            <div id="tabs" role="group" aria-label="Content language"></div>
+            <button class="o" id="out"></button>
+        </div>
+        <div id="stats"></div>
+        <div id="form"></div>
+    </section>
+</main>
+
+<div class="save" id="savebar"><div class="in">
+    <button id="save"></button>
+    <div class="msg" id="sm" role="status"></div>
+</div></div>
+
+<script src="/translations.js"></script>
+<script src="/admin/admin.js"></script>
+</body>
+</html>
