@@ -312,6 +312,20 @@ async function loadCommonsPhotos(){
 }
 
 loadCommonsPhotos();
+
+/* Administrative outlines from the open geoBoundaries API. */
+async function loadKyrgyzstanBoundaries(){
+ if(window.__thBordersStarted||!window.L)return;window.__thBordersStarted=true;
+ try{
+  const meta=await fetch('https://www.geoboundaries.org/api/current/gbOpen/KGZ/ADM1/').then(r=>r.ok?r.json():null);
+  if(!meta?.gjDownloadURL)return;
+  const geo=await fetch(meta.gjDownloadURL).then(r=>r.ok?r.json():null);
+  if(!geo||!LM)return;
+  L.geoJSON(geo,{style:()=>({color:'#b28a4c',weight:1.4,opacity:.8,fillColor:'#d8c7a5',fillOpacity:.07,dashArray:'4 4'}),interactive:false}).addTo(LM);
+ }catch(e){/* Map markers and OpenStreetMap tiles remain usable without boundaries. */}
+}
+
+setTimeout(loadKyrgyzstanBoundaries,1200);
 </script>
 </body>
 </html>
