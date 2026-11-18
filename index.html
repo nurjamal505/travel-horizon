@@ -86,11 +86,6 @@ em{color:#b3361b;font-style:normal;font-size:.78rem;min-height:1em}
 .warn{background:#fff3d6;color:#5b4300;border-radius:10px;padding:10px 14px}
 .kv{padding-left:18px}.leaflet-container{font:inherit;border-radius:16px;z-index:0}.im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
-/* Compact persistent language switcher */
-.lang-dock{position:fixed;z-index:40;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--ln);border-radius:999px;background:color-mix(in srgb,var(--cd) 94%,transparent);box-shadow:0 5px 24px rgba(0,0,0,.18);backdrop-filter:blur(12px)}
-.lang-dock span{font-size:.72rem;font-weight:800;color:var(--mt)}
-.lang-dock select{width:auto;min-width:82px;border:0;background:transparent;padding:4px 8px;font-weight:800}
-body{padding-bottom:64px}
 </style>
 </head>
 <body>
@@ -101,7 +96,6 @@ body{padding-bottom:64px}
 <select class="lang" aria-label="Language"><option value="en">EN</option><option value="ru">RU</option><option value="ky">KY</option><option value="es">ES</option></select></nav>
 <a class="b" href="#planner" data-i="plan"></a>
 </div></header>
-<div class="lang-dock" aria-label="Choose language"><span>LANGUAGE</span><select class="lang" aria-label="Choose site language"><option value="en">English</option><option value="ru">Русский</option><option value="ky">Кыргызча</option><option value="es">Español</option></select></div>
 <main id="top">
 <section class="hero"><div class="bgi" id="hbg"></div><div class="in">
 <h1 data-i="tag"></h1><p class="sb" data-i="sub"></p>
@@ -193,7 +187,7 @@ const usd=n=>'$'+n.toLocaleString('en-US');
 const dflt=()=>({bud:1200,dur:10,df:'',ty:'',ds:'',mo:0,so:''});
 let F=dflt(),showAll=false,mreg='',sel='',uid=0,PT=2,PD='';
 
-let mty='',hl=[],LM,LG2;
+let mty='',hl=[],LM,LG2,KG_BOUNDARY=null,KG_BOUNDARY_LOADING=false;
 function sc(h,s,lbl,yurt){const r=n=>{const x=Math.sin(s*97.3+n*13.7)*1e4;return x-Math.floor(x)},id='g'+(uid++);
 const P=(b,a,c,o)=>{let q='0,300';for(let i=0;i<=8;i++)q+=` ${i*100},${(b-r(o+i)*a).toFixed(0)}`;return `<polygon points="${q} 800,300" fill="${c}"/>`};
 return `<svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${lbl}"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(${h},60%,68%)"/><stop offset="1" stop-color="#F8F6F0"/></linearGradient></defs><rect width="800" height="300" fill="url(#${id})"/>${P(200,130,'#f4f7f8',1)}${P(225,90,`hsl(${h},18%,62%)`,11)}${P(250,45,'#4f7d67',21)}<rect y="250" width="800" height="50" fill="#25a39b"/>${P(290,35,'#173D32',31)}${yurt?'<path d="M600 280a28 26 0 0156 0z" fill="#fff"/><path d="M620 280a8 12 0 0116 0z" fill="#8a6b3f"/>':''}</svg>`}
@@ -238,10 +232,27 @@ function chips(){$('#chips').innerHTML=['',...Object.keys(R)].map(k=>`<button cl
 function mcard(){const d=D.find(x=>x.id==sel);if(!d){$('#mcard').innerHTML=`<div class="cb"><p class="mt">${t('mh')}</p></div>`;return}
 const tr=TR.filter(x=>x.ds.includes(d.id));
 $('#mcard').innerHTML=`<div class="im" style="height:150px">${pic(d)}</div><div class="cb"><h3>${pk(d.n)}</h3><p>${pk(d.ds)}</p>${tr.length?tr.map(x=>`<p><button class="b o" data-t="${x.id}">${pk(x.n)}</button> ${x.d} ${t('days')} · ${t('from')} ${usd(x.p)}</p>`).join(''):`<p class="mt">${t('info')}</p>`}</div>`}
+async function loadKyrgyzstanBoundaries(){
+ if(KG_BOUNDARY||KG_BOUNDARY_LOADING||!LM)return;
+ KG_BOUNDARY_LOADING=true;
+ try{
+  const metaRes=await fetch('https://www.geoboundaries.org/api/current/gbOpen/KGZ/ADM1/');
+  if(!metaRes.ok)throw new Error('Boundary metadata unavailable');
+  const meta=await metaRes.json();
+  if(!meta.gjDownloadURL)throw new Error('GeoJSON URL missing');
+  const geoRes=await fetch(meta.gjDownloadURL);
+  if(!geoRes.ok)throw new Error('Boundary GeoJSON unavailable');
+  const geo=await geoRes.json();
+  KG_BOUNDARY=L.geoJSON(geo,{style:()=>({color:'#b78c4b',weight:1.5,opacity:.9,fillColor:'#c9d8c9',fillOpacity:.13}),onEachFeature:(feature,layer)=>{const name=feature.properties?.shapeName||feature.properties?.shapeName_en||feature.properties?.name||feature.properties?.NAME_1;if(name)layer.bindTooltip(String(name),{sticky:true})}});
+  KG_BOUNDARY.addTo(LM);
+  KG_BOUNDARY.bringToBack();
+ }catch(err){console.warn('Kyrgyzstan region boundaries unavailable',err)}
+ finally{KG_BOUNDARY_LOADING=false}
+}
 function lmap(){const el=$('#mapc');
 if(!LM){el.style.height='440px';LM=L.map(el,{scrollWheelZoom:false}).setView([41.5,74.6],6);
 const tl=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:12,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(LM);
-let er=0;tl.on('tileerror',()=>{if(++er==3)el.style.background='var(--mb)'});LG2=L.layerGroup().addTo(LM)}
+let er=0;tl.on('tileerror',()=>{if(++er==3)el.style.background='var(--mb)'});LG2=L.layerGroup().addTo(LM);loadKyrgyzstanBoundaries()}
 LG2.clearLayers();
 D.filter(d=>(!mreg||d.rg==mreg)&&(!mty||d.a.includes(mty))).forEach(d=>{const has=TR.some(x=>x.ds.includes(d.id)),hi=hl.includes(d.id);
 L.circleMarker([d.la,d.lo],{radius:hi?12:8,color:hi?'#c0572b':'#fff',weight:hi?3:2,fillColor:has?'#173D32':'#c9a24b',fillOpacity:1}).on('click',()=>{sel=d.id;mcard()}).bindTooltip(pk(d.n)).addTo(LG2)});
