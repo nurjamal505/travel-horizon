@@ -243,21 +243,36 @@ async function hydratePhotos(){
 }
 const EXPERIENCE_SEARCH={trek:'mountain trekking Kyrgyzstan Tian Shan',horse:'horse riding Kyrgyzstan',yurt:'Kyrgyzstan yurt camp',photo:'Kyrgyzstan mountain landscape photography',cult:'Kyrgyz traditional food dastorkon',ski:'ski resort Karakol Kyrgyzstan'};
 const experiencePhotos={};
+const experiencePhotoMeta={};
+function paintExperiencePhoto(e){
+ const card=document.querySelector('[data-exp-photo="'+e[0]+'"]'),src=experiencePhotos[e[0]];
+ if(!card||!src||card.querySelector('.experience-photo'))return;
+ const img=document.createElement('img');img.src=src;img.alt=pk(e[1]);img.loading='lazy';img.referrerPolicy='no-referrer';img.className='experience-photo';img.onerror=()=>{img.remove();card.classList.add('photo-fallback')};card.prepend(img);
+ const meta=experiencePhotoMeta[e[0]]||{};
+ const credit=document.createElement('a');credit.className='experience-credit';credit.href=meta.url||'https://commons.wikimedia.org/';credit.target='_blank';credit.rel='noopener noreferrer';credit.textContent='© '+(meta.artist||'Wikimedia Commons')+' · '+(meta.license||'CC BY-SA');card.appendChild(credit);
+}
 async function hydrateExperiencePhotos(){
  await Promise.all(EX.map(async e=>{
-  if(experiencePhotos[e[0]])return;
+  if(experiencePhotos[e[0]]){paintExperiencePhoto(e);return}
   try{
-   const q=encodeURIComponent(EXPERIENCE_SEARCH[e[0]]||pk(e[1])+' Kyrgyzstan');
-   const url='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=18&gsrsearch='+q+'&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=900';
-   const r=await fetch(url);if(!r.ok)return;const j=await r.json();
-   const pages=Object.values(j.query?.pages||{}),allowed=/^(CC0|CC BY(?:-SA)?(?:\s|$)|Public domain)/i;
-   const best=pages.find(p=>{const info=p.imageinfo?.[0],m=info?.extmetadata||{};return info?.thumburl&&allowed.test(String(m.LicenseShortName?.value||m.UsageTerms?.value||''))});
-   if(!best)return;
-   const info=best.imageinfo[0],meta=info.extmetadata||{};experiencePhotos[e[0]]=info.thumburl;
-   const card=document.querySelector('[data-exp-photo="'+e[0]+'"]');if(!card)return;
-   const img=document.createElement('img');img.src=info.thumburl;img.alt=pk(e[1]);img.loading='lazy';img.referrerPolicy='no-referrer';img.className='experience-photo';img.onerror=()=>img.remove();card.prepend(img);
-   const credit=document.createElement('a');credit.className='experience-credit';credit.href=info.descriptionurl||info.url;credit.target='_blank';credit.rel='noopener noreferrer';credit.textContent='© '+String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim()+' · '+String(meta.LicenseShortName?.value||'CC').replace(/<[^>]*>/g,' ').trim();card.appendChild(credit);
-  }catch(err){console.warn('Experience image unavailable',e[0],err.message)}
+   const terms=[EXPERIENCE_SEARCH[e[0]]||pk(e[1])+' Kyrgyzstan',pk(e[1]).split('|')[0]+' Kyrgyzstan landscape'];
+   for(const term of terms){
+    const q=encodeURIComponent(term);
+    const url='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch='+q+'&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=1100';
+    const r=await fetch(url);if(!r.ok)continue;const j=await r.json();
+    const pages=Object.values(j.query?.pages||{});
+    const allowed=/^(CC0|CC BY(?:-SA)?(?:\\s|$)|Public domain)/i;
+    const best=pages.find(p=>{
+     const info=p.imageinfo?.[0],m=info?.extmetadata||{};
+     return info?.thumburl&&allowed.test(String(m.LicenseShortName?.value||m.UsageTerms?.value||''));
+    });
+    if(!best)continue;
+    const info=best.imageinfo[0],meta=info.extmetadata||{};
+    experiencePhotos[e[0]]=info.thumburl;
+    experiencePhotoMeta[e[0]]={url:info.descriptionurl||info.url,artist:String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ').trim(),license:String(meta.LicenseShortName?.value||'CC BY-SA').replace(/<[^>]*>/g,' ').trim()};
+    paintExperiencePhoto(e);break;
+   }
+  }catch(err){console.warn('Experience photo unavailable',e[0],err.message)}
  }));
 }
 const pic=d=>sc(d.h,d.i,pk(d.n))+'<span hidden data-photo-slot="'+d.id+'"></span>'+(IMG[d.id]?'<img data-photo="'+d.id+'" src="'+IMG[d.id]+'" alt="'+pk(d.n)+'" loading="lazy">'+(PHOTO_CREDIT[d.id]?'<a class="photo-credit" href="'+PHOTO_CREDIT[d.id].url+'" target="_blank" rel="noopener noreferrer">© '+PHOTO_CREDIT[d.id].artist+' · '+PHOTO_CREDIT[d.id].license+'</a>':''):'');
@@ -426,7 +441,7 @@ if(a.id=='clr'||a.id=='clr2'){F=dflt();filters();grid();return}
 if(a.dataset.t){openTour(a.dataset.t,a.dataset.f);return}
 if(a.dataset.d){openDest(a.dataset.d);return}
 if(a.dataset.x!==undefined){if(!a.dataset.x){go('#planner');return}F=dflt();F.ty=a.dataset.x;filters();grid();go('#tours');return}
-if(a.dataset.mk){sel=a.dataset.mk;mcard();const point=$('[data-mk="'+sel+'"]');if(point)point.classList.add('active');return}
+if(a.dataset.mk){sel=a.dataset.mk;$('.map-point.active').forEach(p=>p.classList.remove('active'));a.classList.add('active');mcard();return}
 if(a.dataset.region!==undefined){mreg=mreg===a.dataset.region?'':a.dataset.region;map();return}
 if(a.dataset.ty!==undefined){mty=a.dataset.ty;map();return}
 if(a.dataset.rg!==undefined){mreg=a.dataset.rg;map();return}
