@@ -432,7 +432,6 @@ dlg.addEventListener('submit',async e=>{
 dlg.addEventListener('input',e=>{const n=e.target.name;if(n=='cc')e.target.dataset.m=1;if(n=='country'){const c=Object.keys(CC).find(k=>cname(k)==e.target.value),cc=e.target.form.elements.cc;if(c&&!cc.dataset.m)cc.value='+'+CC[c]}});
 $('#dx').onclick=()=>dlg.close();dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
 const go=s=>$(s).scrollIntoView();
-document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-mk],[data-region]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
 document.addEventListener('click',e=>{const a=e.target.closest('[data-t],[data-d],[data-x],[data-mk],[data-rg],[data-region],[data-ty],[data-ft],#dm,#clr,#clr2,#bg,#nv a');if(!a)return;
 if(a.id=='bg'){const o=$('#nv').classList.toggle('open');a.setAttribute('aria-expanded',o);return}
 if(a.closest('#nv')){$('#nv').classList.remove('open');return}
