@@ -88,7 +88,7 @@ em{color:#b3361b;font-style:normal;font-size:.78rem;min-height:1em}
 
 
 .map-illustration{background:#edf3ee;border:1px solid var(--ln);border-radius:20px;overflow:hidden;padding:clamp(8px,2vw,20px);box-shadow:0 12px 34px rgba(20,45,34,.08)}.map-illustration img{display:block;width:100%;height:auto;border-radius:14px}.map-legend{display:flex;gap:18px;flex-wrap:wrap;padding:12px 8px 2px;color:var(--fg);font-size:.88rem}.map-legend span:first-child{color:#58765e}.map-legend span:nth-child(2){color:#218da0}.map-legend span:nth-child(3){color:#b85a3d}
-</style>
+.ex button{isolation:isolate}.ex .experience-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;transition:transform .35s}.ex button:hover .experience-photo{transform:scale(1.045)}.ex .experience-credit{position:absolute;right:7px;top:7px;max-width:85%;padding:3px 6px;border-radius:6px;background:rgba(12,26,21,.65);color:white;font-size:9px;text-decoration:none;opacity:.88;z-index:2}.ex button>svg{position:relative;z-index:-2}</style>
 </head>
 <body>
 <header><div class="hd">
@@ -239,6 +239,25 @@ async function hydratePhotos(){
  }));
  if(LM)lmap();
 }
+const EXPERIENCE_SEARCH={trek:'mountain trekking Kyrgyzstan Tian Shan',horse:'horse riding Kyrgyzstan',yurt:'Kyrgyzstan yurt camp',photo:'Kyrgyzstan mountain landscape photography',cult:'Kyrgyz traditional food dastorkon',ski:'ski resort Karakol Kyrgyzstan'};
+const experiencePhotos={};
+async function hydrateExperiencePhotos(){
+ await Promise.all(EX.map(async e=>{
+  if(experiencePhotos[e[0]])return;
+  try{
+   const q=encodeURIComponent(EXPERIENCE_SEARCH[e[0]]||pk(e[1])+' Kyrgyzstan');
+   const url='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=18&gsrsearch='+q+'&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=900';
+   const r=await fetch(url);if(!r.ok)return;const j=await r.json();
+   const pages=Object.values(j.query?.pages||{}),allowed=/^(CC0|CC BY(?:-SA)?(?:\\s|$)|Public domain)/i;
+   const best=pages.find(p=>{const info=p.imageinfo?.[0],m=info?.extmetadata||{};return info?.thumburl&&allowed.test(String(m.LicenseShortName?.value||m.UsageTerms?.value||''))});
+   if(!best)return;
+   const info=best.imageinfo[0],meta=info.extmetadata||{};experiencePhotos[e[0]]=info.thumburl;
+   const card=document.querySelector('[data-exp-photo="'+e[0]+'"]');if(!card)return;
+   const img=document.createElement('img');img.src=info.thumburl;img.alt=pk(e[1]);img.loading='lazy';img.referrerPolicy='no-referrer';img.className='experience-photo';img.onerror=()=>img.remove();card.prepend(img);
+   const credit=document.createElement('a');credit.className='experience-credit';credit.href=info.descriptionurl||info.url;credit.target='_blank';credit.rel='noopener noreferrer';credit.textContent='© '+String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ').trim()+' · '+String(meta.LicenseShortName?.value||'CC').replace(/<[^>]*>/g,' ').trim();card.appendChild(credit);
+  }catch(err){console.warn('Experience image unavailable',e[0],err.message)}
+ }));
+}
 const pic=d=>sc(d.h,d.i,pk(d.n))+'<span hidden data-photo-slot="'+d.id+'"></span>'+(IMG[d.id]?'<img data-photo="'+d.id+'" src="'+IMG[d.id]+'" alt="'+pk(d.n)+'" loading="lazy">'+(PHOTO_CREDIT[d.id]?'<a class="photo-credit" href="'+PHOTO_CREDIT[d.id].url+'" target="_blank" rel="noopener noreferrer">© '+PHOTO_CREDIT[d.id].artist+' · '+PHOTO_CREDIT[d.id].license+'</a>':''):'');
 const CC={US:1,CA:1,MX:52,BR:55,AR:54,CL:56,CO:57,PE:51,GB:44,IE:353,FR:33,DE:49,IT:39,ES:34,PT:351,NL:31,BE:32,CH:41,AT:43,SE:46,NO:47,DK:45,FI:358,PL:48,CZ:420,GR:30,TR:90,UA:380,KZ:7,RU:7,UZ:998,KG:996,TJ:992,TM:993,BY:375,GE:995,AM:374,AZ:994,CN:86,JP:81,KR:82,IN:91,SG:65,TH:66,VN:84,MY:60,ID:62,PH:63,AU:61,NZ:64,AE:971,SA:966,IL:972,EG:20,ZA:27,HK:852,TW:886};
 const BU=['','<500','500-1000','1000-1500','1500-2500','2500+'];
@@ -263,7 +282,7 @@ function grid(){let l=TR.filter(x=>x.p<=F.bud&&x.d<=F.dur&&(!F.df||x.df==F.df)&&
 if(F.so=='p')l.sort((a,b)=>a.p-b.p);if(F.so=='d')l.sort((a,b)=>a.d-b.d);
 $('#cnt').textContent=`${l.length} ${t('cnt')}`;
 $('#tg').innerHTML=l.length?l.map(tcard).join(''):`<div class="empty"><p>${t('empty')}</p><button class="b" id="clr2">${t('clr')}</button></div>`}
-function exps(){$('#ex').innerHTML=EX.map((e,i)=>`<button data-x="${e[3]}" data-k="${e[0]}" aria-label="${pk(e[1])}">${sc(e[2],i+40,pk(e[1]),e[0]=='yurt')}<span>${pk(e[1])}${e[3]?'':` · ${t('req')}`}</span></button>`).join('')}
+function exps(){$('#ex').innerHTML=EX.map((e,i)=>`<button data-x="${e[3]}" data-k="${e[0]}" data-exp-photo="${e[0]}" aria-label="${pk(e[1])}">${sc(e[2],i+40,pk(e[1]),e[0]=='yurt')}<span>${pk(e[1])}${e[3]?'':` · ${t('req')}`}</span></button>`).join('');hydrateExperiencePhotos()}
 
 function svgMap(){const X=lo=>((lo-69.5)/11*800).toFixed(0),Y=la=>((43.5-la)/4.5*435).toFixed(0);
 $('#chips').innerHTML=['',...Object.keys(R)].map(k=>`<button class="b${mreg==k?'':' o'}" data-rg="${k}">${k?pk(R[k]):t('allr')}</button>`).join('');
