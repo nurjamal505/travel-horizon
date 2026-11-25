@@ -24,7 +24,15 @@ module.exports=async(req,res)=>{
   if(!response.ok||!tg.ok){const description=clean(tg.description||'',220);console.error('telegram_send_failed',{http:response.status,code:tg.error_code,description});const detail=tg.error_code===401?'Bot token is invalid. Copy a fresh token from @BotFather.':tg.error_code===400?'Telegram rejected the chat. Open the bot and press Start; verify TELEGRAM_CHAT_ID.':description||'Telegram API rejected the request.';return out(502,{ok:false,error:'telegram_delivery_failed',detail,telegram_code:tg.error_code||null})}
  }catch(error){console.error('telegram_network_error',error.name);return out(504,{ok:false,error:'telegram_network_error',detail:'Could not reach Telegram. Retry shortly.'})}finally{clearTimeout(timer)}
  done.set(v.key,ref);if(done.size>3000)done.clear();
- let saved=false,warning=null;const sb=String(process.env.SUPABASE_URL||'').trim().replace(/\\/+$/,'');const service=String(process.env.SUPABASE_SERVICE_ROLE_KEY||'').trim();
- if(sb&&service){try{const response=await fetch(sb+'/rest/v1/bookings?on_conflict=idempotency_key',{method:'POST',headers:{apikey:service,Authorization:'Bearer '+service,'Content-Type':'application/json',Prefer:'resolution=ignore-duplicates,return=minimal'},body:JSON.stringify({name:v.name,country:v.country,phone:v.phone,tour:TOURS[v.tour],language:LANGS[v.lang],notes:v.notes,status:'new',telegram_ref:ref,idempotency_key:v.key})});if(response.ok)saved=true;else{warning='telegram_sent_database_save_failed';console.error('supabase_insert_failed',response.status,(await response.text()).slice(0,300))}}catch(error){warning='telegram_sent_database_unreachable';console.error('supabase_insert_error',error.name)}}else warning='supabase_not_configured';
+ let saved=false,warning=null;
+ try{
+  const {put}=require('@vercel/blob');
+  const record={ref,name:v.name,country:v.country,phone:v.phone,notes:v.notes,tour:TOURS[v.tour],language:LANGS[v.lang],status:'new',created_at:new Date().toISOString(),telegram_ref:ref};
+  const iv=crypto.randomBytes(12),cipher=crypto.createCipheriv('aes-256-gcm',crypto.createHash('sha256').update(String(process.env.ADMIN_SESSION_SECRET||'')).digest(),iv);
+  const encrypted=Buffer.concat([cipher.update(JSON.stringify(record),'utf8'),cipher.final()]);
+  const payload=Buffer.concat([iv,cipher.getAuthTag(),encrypted]).toString('base64');
+  await put('data/bookings/'+ref+'.enc',payload,{access:'public',addRandomSuffix:false,contentType:'text/plain',cacheControlMaxAge:60});
+  saved=true;
+ }catch(error){warning='telegram_sent_database_save_failed';console.error('booking_blob_save_failed',error.message)}
  return out(200,{ok:true,ref,notified:true,saved,warning});
 };
