@@ -251,17 +251,12 @@ async function loadKyrgyzstanBoundaries(){
  if(KG_BOUNDARY||KG_BOUNDARY_LOADING||!LM)return;
  KG_BOUNDARY_LOADING=true;
  try{
-  const metaRes=await fetch('https://www.geoboundaries.org/api/current/gbOpen/KGZ/ADM1/');
-  if(!metaRes.ok)throw new Error('Boundary metadata unavailable');
-  const meta=await metaRes.json();
-  if(!meta.gjDownloadURL)throw new Error('GeoJSON URL missing');
-  const geoRes=await fetch(meta.gjDownloadURL);
-  if(!geoRes.ok)throw new Error('Boundary GeoJSON unavailable');
-  const geo=await geoRes.json();
-  KG_BOUNDARY=L.geoJSON(geo,{style:()=>({color:'#b78c4b',weight:1.5,opacity:.9,fillColor:'#c9d8c9',fillOpacity:.13}),onEachFeature:(feature,layer)=>{const name=feature.properties?.shapeName||feature.properties?.shapeName_en||feature.properties?.name||feature.properties?.NAME_1;if(name)layer.bindTooltip(String(name),{sticky:true})}});
-  KG_BOUNDARY.addTo(LM);
-  KG_BOUNDARY.bringToBack();
- }catch(err){console.warn('Kyrgyzstan region boundaries unavailable',err)}
+  const response=await fetch('/data/kyrgyzstan-regions.geojson');
+  if(!response.ok)throw new Error('Local Kyrgyzstan GeoJSON unavailable');
+  const geo=await response.json();
+  KG_BOUNDARY=L.geoJSON(geo,{style:()=>({color:'#b78c4b',weight:2,opacity:.95,fillColor:'#c9d8c9',fillOpacity:.20}),onEachFeature:(feature,layer)=>{const name=feature.properties?.name||feature.properties?.NAME_1||feature.properties?.shapeName;if(name)layer.bindTooltip(String(name),{sticky:true})}});
+  KG_BOUNDARY.addTo(LM);KG_BOUNDARY.bringToBack();
+ }catch(err){console.warn('Kyrgyzstan oblast boundaries unavailable',err)}
  finally{KG_BOUNDARY_LOADING=false}
 }
 function lmap(){const el=$('#mapc');
