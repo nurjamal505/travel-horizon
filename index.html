@@ -337,11 +337,11 @@ dlg.addEventListener('submit',async e=>{
  const btn=$('#fb2');btn.disabled=true;btn.textContent=L==='ru'?'Отправляем…':'Sending…';
  try{
   const j=await submitRequest({name:v.name.trim(),country:v.country.trim(),phone:v.phone.trim(),notes:(v.notes||'').trim(),tour:f.dataset.id,lang:L,key:KEY});
-  $('#res').textContent=(L==='ru'?'Заявка отправлена. Номер: ':'Inquiry sent. Reference: ')+j.ref;
+  $('#res').textContent=(L==='ru'?'Заявка отправлена в Telegram. Номер: ':'Inquiry sent to Telegram. Reference: ')+j.ref+(j.warning==='supabase_not_configured'?(L==='ru'?' (база заявок пока не подключена)':' (database not connected)'):'');
   btn.textContent=L==='ru'?'Отправлено':'Sent';KEY=crypto.randomUUID();
  }catch(err){
-  const msg={not_configured:L==='ru'?'Сервис заявок не настроен. Свяжитесь с нами напрямую.':'The inquiry service is not configured yet.',storage_failed:L==='ru'?'Не удалось сохранить заявку. Попробуйте позже.':'Could not save the inquiry. Please try again.',delivery_failed:err.saved?(L==='ru'?'Заявка сохранена, но уведомление в Telegram не доставлено.':'Saved, but Telegram notification failed.'):(L==='ru'?'Telegram не принял заявку. Проверьте настройки.':'Telegram rejected the inquiry. Check configuration.'),rate_limited:L==='ru'?'Слишком много попыток. Подождите немного.':'Too many attempts. Please wait.'};
-  $('#res').textContent=msg[err.error]||(L==='ru'?'Ошибка отправки. Попробуйте ещё раз.':'Could not send. Please try again.');
+  const msg={not_configured:L==='ru'?'Сервис заявок не настроен.':'The inquiry service is not configured.',telegram_not_configured:L==='ru'?'В Vercel не заданы значения TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID.':'Telegram secrets are empty in Vercel.',telegram_delivery_failed:L==='ru'?'Telegram отклонил заявку. Проверьте токен, Chat ID и нажмите Start у бота.':'Telegram rejected the request. Check token, Chat ID and press Start in the bot.',telegram_network_error:L==='ru'?'Нет соединения с Telegram. Попробуйте позже.':'Cannot reach Telegram. Try again later.',storage_failed:L==='ru'?'Не удалось сохранить заявку. Попробуйте позже.':'Could not save the inquiry.',delivery_failed:L==='ru'?'Telegram не принял заявку. Проверьте настройки.':'Telegram rejected the inquiry.',rate_limited:L==='ru'?'Слишком много попыток. Подождите немного.':'Too many attempts. Please wait.'};
+  $('#res').textContent=(msg[err.error]||(L==='ru'?'Ошибка отправки.':'Could not send.'))+(err.detail?' '+err.detail:'');
   btn.disabled=false;btn.textContent=L==='ru'?'Отправить заявку':'Send inquiry';
  }
 });
