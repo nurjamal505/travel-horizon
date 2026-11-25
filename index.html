@@ -135,7 +135,7 @@ em{color:#b3361b;font-style:normal;font-size:.78rem;min-height:1em}
 </main>
 
 <footer id="footer"><div class="w">
-<div><strong>Travel Horizon</strong><p data-i="fd"></p><select class="lang" aria-label="Language"><option value="en">English</option><option value="ru">Русский</option><option value="ky">Кыргызча</option><option value="es">Español</option></select></div>
+<div><strong>Travel Horizon</strong><p data-i="fd"></p></div>
 <div><a href="#destinations" data-i="n1"></a><a href="#tours" data-i="n2"></a><a href="#faq" data-i="h6"></a></div>
 <div><small data-i="fc"></small><br><small data-i="fs"></small></div>
 <div><small data-i="fp"></small><br><small data-i="ft"></small><p><small data-i="fa"></small></p><small data-i="fr"></small></div>
@@ -279,17 +279,40 @@ function openDest(id){const d=D.find(x=>x.id==id),rel=TR.filter(x=>x.ds.includes
 $('#dc').innerHTML=`<div class="im" style="height:260px">${pic(d)}</div><div class="dp"><h2>${pk(d.n)}</h2><p>${pk(d.ds)}</p><ul class="kv"><li>${t('reg')}: ${pk(R[d.rg])}</li><li>${t('dur')}: ${d.du} ${t('days')}</li><li>${t('seas')}: ${mn(d.m[0])}–${mn(d.m[1])}</li><li>${t('act')}: ${d.a.map(t).join(', ')}</li></ul><p class="mt">${t('notes')}</p><h3>${t('rel')}</h3>${rel.length?`<div class="row">${rel.map(x=>`<button class="b o" data-t="${x.id}">${pk(x.n)}</button>`).join('')}</div>`:`<p>${t('norel')}</p>`}</div>`;open()}
 function openTour(id,f){hl=(TR.find(y=>y.id==id)||{ds:[]}).ds;if(LM)lmap();const x=TR.find(y=>y.id==id),d0=D.find(d=>d.id==x.ds[0]),mind=new Date(Date.now()+864e5).toISOString().slice(0,10);
 $('#dc').innerHTML=`<div class="im" style="height:230px">${pic(d0)}</div><div class="dp"><h2>${pk(x.n)}</h2><p>${x.d} ${t('days')} · ${t('d_'+x.df)} · ${t('from')} <b>${usd(x.p)}</b> ${t('pp')} (${t('il')})</p><h3>${t('rt')}</h3><ol>${x.r.split(' · ').map(s=>`<li>${s}</li>`).join('')}</ol><p>${t('seas')}: ${mn(x.m[0])}–${mn(x.m[1])}</p><p class="mt">${t('ill')}</p>${x.rm?`<p class="warn">${t('remote')}</p>`:''}<div class="two"><div><h3>${t('inc')}</h3><p>${t('incl')}</p></div><div><h3>${t('exc')}</h3><p>${t('excl')}</p></div></div>
-<h3 id="rq">${t('rq')}</h3><form id="bf" novalidate data-id="${x.id}"><div class="fg"><label>${t('fn')}<input name="name" autocomplete="name"><em data-e="name"></em></label><label>${t('fe')}<input name="email" type="email" autocomplete="email"><em data-e="email"></em></label><label>${t('fc2')}<input name="country" list="cl" autocomplete="off"><em data-e="country"></em></label><div class="row" style="flex-wrap:nowrap;align-items:flex-start"><label style="width:96px">${t('fcc')}<input name="cc" placeholder="+"></label><label style="flex:1">${t('fph')}<input name="phone" type="tel" autocomplete="tel-national"><em data-e="contact"></em></label></div><label>${t('flg')}<select name="lg">${LG.map(l=>`<option value="${l}"${l==L?' selected':''}>${l.toUpperCase()}</option>`).join('')}</select></label><label>${t('fbu')}<select name="budget">${BU.map(b=>`<option value="${b}">${b?'$'+b:t('bu0')}</option>`).join('')}</select></label><label>${t('fdt')}<input name="date" type="date" min="${mind}" value="${PD>=mind?PD:''}"><em data-e="date"></em></label><label>${t('ftr')}<input name="trav" type="number" min="1" max="20" value="${PT}"><em data-e="trav"></em></label></div><label style="margin:12px 0">${t('fno')}<textarea name="notes" rows="2"></textarea></label><label style="flex-direction:row;gap:8px;align-items:flex-start;font-weight:400;margin-bottom:6px"><input type="checkbox" name="consent" style="width:auto;margin-top:4px">${t('fco')}</label><em data-e="consent"></em><datalist id="cl">${CL()}</datalist><p id="sm" class="mt" hidden></p><button class="b" id="fb2">${t('frv')}</button><p id="res" role="status"></p></form></div>`;open();if(f)setTimeout(()=>$('#rq').scrollIntoView(),50)}
+<h3 id="rq">${t('rq')}</h3><form id="bf" novalidate data-id="${x.id}">
+<div class="fg">
+<label>${t('fn')}<input name="name" autocomplete="name" required maxlength="100"><em data-e="name"></em></label>
+<label>${t('fc2')}<input name="country" list="cl" autocomplete="country-name" required maxlength="60"><em data-e="country"></em></label>
+<label>${t('fph')}<input name="phone" type="tel" autocomplete="tel" placeholder="+996 555 123 456" required maxlength="25"><em data-e="phone"></em></label>
+<label>${t('fno')}<textarea name="notes" rows="2" maxlength="1000"></textarea></label>
+</div>
+<p class="mt">${L==='ru'?'Мы свяжемся с вами по указанному номеру.':'We will contact you using the phone number above.'}</p>
+<datalist id="cl">${CL()}</datalist><p id="res" role="status" aria-live="polite"></p>
+<button class="b" id="fb2">${L==='ru'?'Отправить заявку':'Send inquiry'}</button></form></div>`;open();if(f)setTimeout(()=>$('#rq').scrollIntoView(),50)}
 /* Integration point: replace with fetch() to Supabase / email service / CRM. */
 async function submitRequest(p){const r=await fetch('/api/booking',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});const j=await r.json().catch(()=>({}));if(!r.ok||!j.ok)throw j;return j}
 let KEY=crypto.randomUUID();
 dlg.addEventListener('input',e=>{const f=e.target.form;if(f&&f.id=='bf'&&f.dataset.r){delete f.dataset.r;$('#sm').hidden=true;$('#fb2').textContent=t('frv')}});
-dlg.addEventListener('submit',async e=>{e.preventDefault();const f=e.target;if(f.id!='bf')return;const v=Object.fromEntries(new FormData(f)),er={},x=TR.find(y=>y.id==f.dataset.id);
-if(!v.name.trim())er.name='e_name';if(!v.country.trim())er.country='e_country';const ph=v.phone.trim(),em=v.email.trim();if(!em&&!ph)er.contact='e_contact';else{if(em&&!/^\S+@\S+\.\S+$/.test(em))er.email='e_email';if(ph&&!/^[0-9 ()\-]{5,15}$/.test(ph))er.contact='e_phone';if(ph&&!/^\+\d{1,4}$/.test(v.cc.trim()))er.contact='e_cc'}if(!f.elements.consent.checked)er.consent='e_consent';if(!v.date||new Date(v.date)<=new Date())er.date='e_date';const n=+v.trav;if(!(n>=1&&n<=20))er.trav='e_trav';
-f.querySelectorAll('[data-e]').forEach(m=>m.textContent=er[m.dataset.e]?t(er[m.dataset.e]):'');
-const ks=Object.keys(er);if(ks.length){(f.elements[ks[0]]||f.elements.phone).focus();return}
-if(!f.dataset.r){f.dataset.r=1;const s=$('#sm');s.hidden=false;s.textContent=`${pk(x.n)} · ${v.name} · ${v.email} · ${v.date} · ${n} ${t('ftr')} · ${t('from')} ${usd(x.p*n)} (${t('il')})`;$('#fb2').textContent=t('fsd');return}
-const bt=$('#fb2');bt.disabled=true;try{const j=await submitRequest({...v,consent:true,lang:v.lg||L,tour:x.id,key:KEY});$('#res').textContent=`${t('sent')} ${j.ref}`;bt.hidden=true;KEY=crypto.randomUUID()}catch(err){const code=err&&err.error;const msg={not_configured:{en:'The booking service is not configured yet. Please contact us directly.',ru:err.saved?'Заявка сохранена, но Telegram пока не настроен. Команда увидит её в админке.':'Сервис заявок ещё не настроен. Пожалуйста, свяжитесь с нами напрямую.',ky:'Сурам кызматы азырынча жөндөлө элек. Биз менен түз байланышыңыз.',es:'El servicio de reservas aún no está configurado. Contáctanos directamente.'},storage_failed:{en:'We could not save your request. Please try again.',ru:'Не удалось сохранить заявку. Попробуйте ещё раз.',ky:'Сурам сакталган жок. Кайра аракет кылыңыз.',es:'No pudimos guardar tu solicitud. Inténtalo de nuevo.'},delivery_failed:{en:err.saved?'Your request was saved, but Telegram notification failed. Our team can still see it.':'Telegram delivery failed. Please try again or contact us directly.',ru:err.saved?'Заявка сохранена, но уведомление в Telegram не доставлено. Команда увидит её в админке.':'Не удалось доставить заявку в Telegram. Попробуйте ещё раз или свяжитесь с нами напрямую.',ky:err.saved?'Сурам сакталды, бирок Telegram билдирүүсү жеткен жок. Команда аны админ панелден көрөт.':'Telegram билдирүүсү жеткен жок. Кайра аракет кылыңыз.',es:err.saved?'Tu solicitud se guardó, pero falló la notificación de Telegram. El equipo puede verla.':'Falló el envío a Telegram. Inténtalo de nuevo o contáctanos.'}};$('#res').textContent=(msg[code]&&msg[code][L])||t('err');bt.disabled=false}});
+dlg.addEventListener('submit',async e=>{
+ e.preventDefault();const f=e.target;if(f.id!=='bf')return;
+ const v=Object.fromEntries(new FormData(f)),err={};
+ if(!v.name.trim())err.name=L==='ru'?'Введите имя.':'Enter your name.';
+ if(!v.country.trim())err.country=L==='ru'?'Укажите страну.':'Enter your country.';
+ if(!v.phone.trim())err.phone=L==='ru'?'Укажите номер телефона с кодом страны.':'Enter a phone number with country code.';
+ else if(!/^\+?[0-9 ()-]{7,22}$/.test(v.phone.trim()))err.phone=L==='ru'?'Проверьте формат номера.':'Check the phone number format.';
+ f.querySelectorAll('[data-e]').forEach(el=>el.textContent=err[el.dataset.e]||'');
+ if(Object.keys(err).length){f.querySelector('[name="'+Object.keys(err)[0]+'"]').focus();return}
+ const btn=$('#fb2');btn.disabled=true;btn.textContent=L==='ru'?'Отправляем…':'Sending…';
+ try{
+  const j=await submitRequest({name:v.name.trim(),country:v.country.trim(),phone:v.phone.trim(),notes:(v.notes||'').trim(),tour:f.dataset.id,lang:L,key:KEY});
+  $('#res').textContent=(L==='ru'?'Заявка отправлена. Номер: ':'Inquiry sent. Reference: ')+j.ref;
+  btn.textContent=L==='ru'?'Отправлено':'Sent';KEY=crypto.randomUUID();
+ }catch(err){
+  const msg={not_configured:L==='ru'?'Сервис заявок не настроен. Свяжитесь с нами напрямую.':'The inquiry service is not configured yet.',storage_failed:L==='ru'?'Не удалось сохранить заявку. Попробуйте позже.':'Could not save the inquiry. Please try again.',delivery_failed:err.saved?(L==='ru'?'Заявка сохранена, но уведомление в Telegram не доставлено.':'Saved, but Telegram notification failed.'):(L==='ru'?'Telegram не принял заявку. Проверьте настройки.':'Telegram rejected the inquiry. Check configuration.'),rate_limited:L==='ru'?'Слишком много попыток. Подождите немного.':'Too many attempts. Please wait.'};
+  $('#res').textContent=msg[err.error]||(L==='ru'?'Ошибка отправки. Попробуйте ещё раз.':'Could not send. Please try again.');
+  btn.disabled=false;btn.textContent=L==='ru'?'Отправить заявку':'Send inquiry';
+ }
+});
 dlg.addEventListener('input',e=>{const n=e.target.name;if(n=='cc')e.target.dataset.m=1;if(n=='country'){const c=Object.keys(CC).find(k=>cname(k)==e.target.value),cc=e.target.form.elements.cc;if(c&&!cc.dataset.m)cc.value='+'+CC[c]}});
 $('#dx').onclick=()=>dlg.close();dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
 const go=s=>$(s).scrollIntoView();
