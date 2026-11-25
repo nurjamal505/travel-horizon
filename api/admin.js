@@ -4,19 +4,20 @@ const secret=()=>String(process.env.ADMIN_SESSION_SECRET||'');
 const pass=()=>String(process.env.ADMIN_PASSWORD||'');
 const cookieName='th_admin';
 const send=(res,status,body)=>res.status(status).json(body);
+function bodyOf(req){if(req.body&&typeof req.body==='object')return req.body;if(typeof req.body==='string'){try{return JSON.parse(req.body)}catch{}}return {}}
 function cookie(res,value,maxAge){res.setHeader('Set-Cookie',cookieName+'='+value+'; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age='+maxAge);}
-function sign(exp){return crypto.createHmac('sha256',secret()).update(String(exp)).digest('base64url')}
+function sign(exp){return crypto.createHmac('sha256',secret().trim()).update(String(exp)).digest('base64url')}
 function isAdmin(req){if(!secret()||!pass())return false;const raw=String(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(cookieName+'='))?.slice(cookieName.length+1)||'';const [exp,sig]=raw.split('.');if(!exp||!sig||Number(exp)<Date.now())return false;const expected=sign(exp);return sig.length===expected.length&&crypto.timingSafeEqual(Buffer.from(sig),Buffer.from(expected))}
-function key(){return crypto.createHash('sha256').update(secret()).digest()}
+function key(){return crypto.createHash('sha256').update(secret().trim()).digest()}
 function encrypt(value){const iv=crypto.randomBytes(12),c=crypto.createCipheriv('aes-256-gcm',key(),iv),data=Buffer.concat([c.update(JSON.stringify(value),'utf8'),c.final()]);return Buffer.concat([iv,c.getAuthTag(),data]).toString('base64')}
 function decrypt(value){const b=Buffer.from(value,'base64'),iv=b.subarray(0,12),tag=b.subarray(12,28),data=b.subarray(28),d=crypto.createDecipheriv('aes-256-gcm',key(),iv);d.setAuthTag(tag);return JSON.parse(Buffer.concat([d.update(data),d.final()]).toString('utf8'))}
 async function readBookings(){const r=await list({prefix:'data/bookings/',limit:1000});const files=r.blobs||[];const rows=await Promise.all(files.map(async f=>{try{const x=await fetch(f.url,{cache:'no-store'});if(!x.ok)return null;return decrypt(Buffer.from(await x.arrayBuffer()).toString('utf8'))}catch(e){console.error('booking_blob_read_failed',f.pathname);return null}}));return rows.filter(Boolean).sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)))}
 module.exports=async(req,res)=>{
  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
  const action=String(req.query?.action||'');
- if(!secret()||!pass())return send(res,503,{ok:false,error:'admin_not_configured'});
+ if(!secret().trim()||!pass().trim())return send(res,503,{ok:false,error:'admin_not_configured'});
  if(req.method==='POST'&&action==='login'){
-  const p=String(req.body?.password||'');const a=crypto.createHash('sha256').update(p).digest(),b=crypto.createHash('sha256').update(pass()).digest();
+  const input=bodyOf(req);const p=String(input.password||'').trim();const configured=pass().trim();const a=crypto.createHash('sha256').update(p).digest(),b=crypto.createHash('sha256').update(configured).digest();
   if(!crypto.timingSafeEqual(a,b)){await new Promise(r=>setTimeout(r,500));return send(res,401,{ok:false,error:'invalid_credentials'})}
   const exp=Date.now()+7*24*60*60*1000;cookie(res,exp+'.'+sign(exp),7*24*60*60);return send(res,200,{ok:true});
  }
