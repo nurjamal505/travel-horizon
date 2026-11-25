@@ -168,6 +168,10 @@ const D=[['ik','Issyk-Kul|Иссык-Куль|Ысык-Көл|Issyk-Kul',42.45,7
 .map((a,i)=>({id:a[0],n:a[1],la:a[2],lo:a[3],rg:a[4],h:a[5],du:a[6],m:a[7],a:a[8],ds:a[9],i:i+1}));
 // Additional map pins for the capital and key transit towns.
 D.push(
+ {id:'ba-city',n:'Batken|Баткен|Баткен|Batken',la:40.062,lo:70.819,rg:'ba',h:35,du:'1',m:[3,11],a:['culture','road'],ds:'A southern town near the dramatic Turkestan Range.|Южный город у живописного Туркестанского хребта.|Түркстан кырка тоосуна жакын түштүк шаар.|Ciudad del sur junto a la cordillera del Turkestán.'},
+ {id:'tok',n:'Toktogul Reservoir|Токтогульское водохранилище|Токтогул суу сактагычы|Embalse de Toktogul',la:41.75,lo:72.95,rg:'ja',h:40,du:'1–2',m:[4,10],a:['road','photo'],ds:'A vast mountain reservoir along the southern road.|Большое горное водохранилище на южном маршруте.|Түштүк жолдогу чоң тоо суу сактагычы.|Un gran embalse de montaña en la ruta del sur.'},
+ {id:'ch-kemin',n:'Chon-Kemin|Чон-Кемин|Чоң-Кемин|Chon-Kemin',la:42.79,lo:76.18,rg:'ch',h:45,du:'1–2',m:[5,10],a:['trek','horse'],ds:'A green valley for horseback rides and hiking.|Зелёная долина для конных прогулок и походов.|Ат минүү жана жөө жүрүштөр үчүн жашыл өрөөн.|Un valle verde para montar a caballo y hacer senderismo.'},
+ {id:'su',n:'Sulaiman-Too|Сулайман-Тоо|Сулайман-Тоо|Sulaiman-Too',la:40.529,lo:72.798,rg:'os',h:50,du:'½',m:[1,12],a:['culture'],ds:'Sacred mountain and UNESCO World Heritage site in Osh.|Священная гора и объект Всемирного наследия ЮНЕСКО в Оше.|Ош шаарындагы ыйык тоо жана ЮНЕСКОнун мурасы.|Montaña sagrada y Patrimonio Mundial de la UNESCO en Osh.'},
  {id:'bi',n:'Bishkek|Бишкек|Бишкек|Bishkek',la:42.8746,lo:74.5698,rg:'bi',h:195,du:'1–2',m:[1,12],a:['culture','road'],ds:'The capital, museums, markets and gateway to the Tian Shan.|Столица, музеи, базары и ворота к Тянь-Шаню.|Борбор шаар, музейлер, базарлар жана Теңир-Тоого жол.|Capital, museos, mercados y puerta de entrada al Tian Shan.'},
  {id:'ny',n:'Naryn|Нарын|Нарын|Naryn',la:41.4287,lo:75.9911,rg:'na',h:35,du:'1',m:[1,12],a:['culture','road'],ds:'A mountain town and gateway to Tash-Rabat and high valleys.|Горный город и отправная точка к Таш-Рабату и высокогорным долинам.|Таш-Рабатка жана бийик өрөөндөргө жол ачкан тоолуу шаар.|Ciudad de montaña y puerta a Tash-Rabat y valles altos.'},
  {id:'ko',n:'Kochkor|Кочкор|Кочкор|Kochkor',la:42.215,lo:75.756,rg:'na',h:45,du:'1',m:[1,12],a:['nomad','culture'],ds:'A craft village known for felt making and routes to Song-Kul.|Село мастеров, известное войлоковалянием и дорогой к Сон-Кулю.|Кийиз өнөрү жана Сөн-Көлгө баруучу жолдору менен белгилүү айыл.|Pueblo artesanal famoso por el fieltro y las rutas a Song-Kul.'}
@@ -230,6 +234,7 @@ async function hydratePhotos(){
    });
   }catch(e){console.warn('Destination photo lookup failed',d.id,e.message)}
  }));
+ if(LM)lmap();
 }
 const pic=d=>sc(d.h,d.i,pk(d.n))+'<span hidden data-photo-slot="'+d.id+'"></span>'+(IMG[d.id]?'<img data-photo="'+d.id+'" src="'+IMG[d.id]+'" alt="'+pk(d.n)+'" loading="lazy">'+(PHOTO_CREDIT[d.id]?'<a class="photo-credit" href="'+PHOTO_CREDIT[d.id].url+'" target="_blank" rel="noopener noreferrer">© '+PHOTO_CREDIT[d.id].artist+' · '+PHOTO_CREDIT[d.id].license+'</a>':''):'');
 const CC={US:1,CA:1,MX:52,BR:55,AR:54,CL:56,CO:57,PE:51,GB:44,IE:353,FR:33,DE:49,IT:39,ES:34,PT:351,NL:31,BE:32,CH:41,AT:43,SE:46,NO:47,DK:45,FI:358,PL:48,CZ:420,GR:30,TR:90,UA:380,KZ:7,RU:7,UZ:998,KG:996,TJ:992,TM:993,BY:375,GE:995,AM:374,AZ:994,CN:86,JP:81,KR:82,IN:91,SG:65,TH:66,VN:84,MY:60,ID:62,PH:63,AU:61,NZ:64,AE:971,SA:966,IL:972,EG:20,ZA:27,HK:852,TW:886};
@@ -309,7 +314,10 @@ function lmap(){
  D.filter(d=>(!mreg||d.rg===mreg)&&(!mty||d.a.includes(mty))).forEach(d=>{
   const has=TR.some(x=>x.ds.includes(d.id)),hi=hl.includes(d.id);
   const marker=L.circleMarker([d.la,d.lo],{radius:hi?10:7,color:'#fff',weight:2,fillColor:has?'#173D32':'#c08b35',fillOpacity:1});
+  const photo=IMG[d.id]?'<img src="'+IMG[d.id]+'" alt="'+pk(d.n)+'" style="width:220px;height:125px;object-fit:cover;border-radius:8px">':'';
+  const credit=PHOTO_CREDIT[d.id]?'<small><a href="'+PHOTO_CREDIT[d.id].url+'" target="_blank" rel="noopener">© '+PHOTO_CREDIT[d.id].artist+' · '+PHOTO_CREDIT[d.id].license+'</a></small>':'';
   marker.bindTooltip(pk(d.n),{direction:'top',offset:[0,-7]});
+  marker.bindPopup('<div style="min-width:220px">'+photo+'<b>'+pk(d.n)+'</b><p>'+pk(d.ds)+'</p>'+credit+'</div>',{maxWidth:260});
   marker.on('click',()=>{sel=d.id;mcard();});
   marker.addTo(LG2);
  });
