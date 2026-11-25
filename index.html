@@ -201,7 +201,14 @@ return `<svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" role="im
 function applyI18n(){document.documentElement.lang=L;$$('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));$$('.lang').forEach(s=>s.value=L)}
 function fill(el,opts,anyKey){const p=el.value;el.innerHTML=(anyKey?`<option value="">${t('any')}</option>`:'')+opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');el.value=p;if(el.value!==p)el.selectedIndex=0}
 const TY=['trek','nomad','culture','road'];
-const IMG={},PHOTO_CREDIT={}; // Licensed photos with visible attribution; SVG illustration fallback.
+const IMG={
+ bu:'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Burana_Tower%2C_Kyrgyzstan.jpg/1280px-Burana_Tower%2C_Kyrgyzstan.jpg',
+ aa:'https://upload.wikimedia.org/wikipedia/commons/9/94/Kyrgyzstan_Ala_Archa_National_Park_03.jpg',
+ os:'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Osh_03-2016_img10_market.jpg/1280px-Osh_03-2016_img10_market.jpg'
+},PHOTO_CREDIT={
+ bu:{url:'https://commons.wikimedia.org/wiki/File:Burana_Tower,_Kyrgyzstan.jpg',artist:'Bernard Gagnon',license:'CC0'},
+ aa:{url:'https://commons.wikimedia.org/wiki/File:Kyrgyzstan_Ala_Archa_National_Park_03.jpg',artist:'Vitaliknyc',license:'CC BY 3.0'}
+}; // Known licensed photos first; discover the rest automatically.
 let photoLoadStarted=false;
 async function hydratePhotos(){
  if(photoLoadStarted)return;photoLoadStarted=true;
