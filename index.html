@@ -254,7 +254,7 @@ async function loadKyrgyzstanBoundaries(){
   const response=await fetch('/data/kyrgyzstan-regions.geojson');
   if(!response.ok)throw new Error('Local Kyrgyzstan GeoJSON unavailable');
   const geo=await response.json();
-  KG_BOUNDARY=L.geoJSON(geo,{style:()=>({color:'#b78c4b',weight:2,opacity:.95,fillColor:'#c9d8c9',fillOpacity:.20}),onEachFeature:(feature,layer)=>{const name=feature.properties?.name||feature.properties?.NAME_1||feature.properties?.shapeName;if(name)layer.bindTooltip(String(name),{sticky:true})}});
+  KG_BOUNDARY=L.geoJSON(geo,{style:()=>({color:'#b78c4b',weight:2,opacity:.95,fillColor:'#c9d8c9',fillOpacity:.20}),onEachFeature:(feature,layer)=>{const name=feature.properties?.name||feature.properties?.NAME_1||feature.properties?.shapeName;if(name)layer.bindTooltip(String(name),{sticky:true});layer.on('click',()=>{const n=String(name||'').toLowerCase();const match=Object.keys(R).find(k=>R[k].split('|').some(v=>v.toLowerCase()===n||v.toLowerCase().includes(n)||n.includes(v.toLowerCase())));if(match){mreg=match;map()}})}});
   KG_BOUNDARY.addTo(LM);KG_BOUNDARY.bringToBack();
  }catch(err){console.warn('Kyrgyzstan oblast boundaries unavailable',err)}
  finally{KG_BOUNDARY_LOADING=false}
