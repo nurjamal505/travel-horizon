@@ -91,7 +91,7 @@ em{color:#b3361b;font-style:normal;font-size:.78rem;min-height:1em}
 .ex button{isolation:isolate}.ex .experience-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;transition:transform .35s}.ex button:hover .experience-photo{transform:scale(1.045)}.ex .experience-credit{position:absolute;right:7px;top:7px;max-width:85%;padding:3px 6px;border-radius:6px;background:rgba(12,26,21,.65);color:white;font-size:9px;text-decoration:none;opacity:.88;z-index:2}.ex button>svg{position:relative;z-index:-2}
 /* Interactive oblast map */
 .mapw{grid-template-columns:minmax(0,2.2fr) minmax(250px,1fr);align-items:start}.kg-map{display:block;width:100%;height:auto;min-height:300px;border-radius:18px;box-shadow:0 12px 32px rgba(24,53,43,.09)}.oblast{fill:url(#kgLand);stroke:#fffdf2;stroke-width:2.2;cursor:pointer;transition:fill .18s,stroke-width .18s}.oblast:hover,.oblast.selected{fill:#9dbb9d;stroke:#b77c40;stroke-width:3.2}.region-label{font:600 13px Arial,sans-serif;fill:#344c3b;text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:#f6f2df;stroke-width:3px;stroke-linejoin:round}.map-point{cursor:pointer;outline:none}.point-halo{fill:#fff;stroke:#c45d39;stroke-width:2;opacity:.95}.point-core{fill:#c45d39;stroke:#fff;stroke-width:1.4}.map-point:hover .point-halo,.map-point:focus .point-halo{r:15;fill:#f6d7a6}.map-caption{font:700 11px Arial,sans-serif;letter-spacing:1.2px;fill:#64766a}.map-illustration{display:none!important}@media(max-width:800px){.mapw{grid-template-columns:1fr}.kg-map{min-height:0}.region-label{font-size:15px}}
-.ex button>svg{position:absolute;inset:0;z-index:0}.ex .experience-photo{z-index:1}.ex button>span{z-index:2}.ex .experience-credit{z-index:3}</style>
+.ex button>svg{position:absolute;inset:0;z-index:0}.ex .experience-photo{z-index:1}.ex button>span{z-index:2}.ex .experience-credit{z-index:3}.kg-region{cursor:pointer;outline:none}.kg-region .oblast{fill:url(#kgLand);stroke:#fffdf2;stroke-width:2.2;vector-effect:non-scaling-stroke;transition:fill .16s,stroke .16s,stroke-width .16s}.kg-region:hover .oblast,.kg-region:focus .oblast,.kg-region.selected .oblast{fill:#9dbb9d;stroke:#a66c38;stroke-width:3.2}.kg-region .region-label{font:700 13px Arial,sans-serif;fill:#344c3b;text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:#f6f2df;stroke-width:3px;stroke-linejoin:round}.map-point{cursor:pointer;outline:none}.map-point.active .point-halo,.map-point:focus .point-halo{r:15;fill:#f6d7a6}.kg-map{display:block;width:100%;height:auto;min-height:300px}.map-illustration{display:none!important}@media(max-width:700px){.kg-region .region-label{font-size:15px}}</style>
 </head>
 <body>
 <header><div class="hd">
@@ -286,34 +286,35 @@ $('#cnt').textContent=`${l.length} ${t('cnt')}`;
 $('#tg').innerHTML=l.length?l.map(tcard).join(''):`<div class="empty"><p>${t('empty')}</p><button class="b" id="clr2">${t('clr')}</button></div>`}
 function exps(){$('#ex').innerHTML=EX.map((e,i)=>`<button data-x="${e[3]}" data-k="${e[0]}" data-exp-photo="${e[0]}" aria-label="${pk(e[1])}">${sc(e[2],i+40,pk(e[1]),e[0]=='yurt')}<span>${pk(e[1])}${e[3]?'':` · ${t('req')}`}</span></button>`).join('');hydrateExperiencePhotos()}
 
-const REGION_CENTERS={'Ysyk-Köl':[42.05,78.1],'Naryn':[41.55,75.3],'Osh':[40.35,73.1],'Chuy':[42.85,74.6],'Talas':[42.35,72.0],'Jalal-Abad':[41.15,72.6],'Batken':[40.05,70.5],'Bishkek':[42.87,74.57]};
-const REGION_NAMES={'Ysyk-Köl':'ik','Naryn':'na','Osh':'os','Chuy':'ch','Talas':'ta','Jalal-Abad':'ja','Batken':'ba','Bishkek':'bi'};
+const REGION_FEATURE_KEYS={'Ysyk-Köl':'ik','Naryn':'na','Osh':'os','Chuy':'ch','Talas':'ta','Jalal-Abad':'ja','Batken':'ba','Bishkek':'bi'};
+const REGION_ANCHORS={'ik':[42.0,78.0],'na':[41.6,75.0],'os':[40.4,73.2],'ch':[42.8,74.5],'ta':[42.3,72.0],'ja':[41.1,72.7],'ba':[40.1,70.5],'bi':[42.87,74.57]};
+let kgGeoPromise=null,kgMapVersion=0;
 function geoPath(coords,X,Y){
  if(!Array.isArray(coords)||!coords.length)return '';
  if(typeof coords[0]?.[0]==='number')return coords.map((c,i)=>(i?'L':'M')+X(c[0])+','+Y(c[1])).join(' ')+' Z';
  return coords.map(r=>geoPath(r,X,Y)).join(' ');
 }
+function mapRegionName(key){return pk(R[key]||key)}
 async function svgMap(){
- const root=$('#mapc');chips();
- root.innerHTML='<div class="cb">Загружаем границы областей Кыргызстана…</div>';
+ const root=$('#mapc'),version=++kgMapVersion;chips();
+ root.innerHTML='<div class="cb">'+(L==='ru'?'Загружаем карту…':L==='ky'?'Карта жүктөлүүдө…':L==='es'?'Cargando mapa…':'Loading map…')+'</div>';
  try{
-  const res=await fetch('/data/kyrgyzstan-regions.geojson',{cache:'force-cache'});if(!res.ok)throw new Error('GeoJSON '+res.status);
-  const geo=await res.json();if(!Array.isArray(geo.features)||geo.features.length<7)throw new Error('В GeoJSON не хватает областей');
-  const minLon=69.2,maxLon=80.4,minLat=39.1,maxLat=43.3,W=900,H=500,pad=28;
+  kgGeoPromise??=fetch('/data/kyrgyzstan-regions.geojson',{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error('GeoJSON '+r.status);return r.json()});
+  const geo=await kgGeoPromise;if(version!==kgMapVersion||!root.isConnected)return;
+  if(!Array.isArray(geo.features)||geo.features.length<8)throw new Error('Incomplete oblast data');
+  const W=900,H=500,pad=28,minLon=69.2,maxLon=80.4,minLat=39.1,maxLat=43.3;
   const X=lon=>(pad+(lon-minLon)/(maxLon-minLon)*(W-2*pad)).toFixed(1);
   const Y=lat=>(pad+(maxLat-lat)/(maxLat-minLat)*(H-2*pad)).toFixed(1);
-  const regionShapes=geo.features.map(f=>{
-   const name=f.properties?.name||f.properties?.NAME_1||'';
-   const key=REGION_NAMES[name]||'';
+  const shapes=geo.features.map(f=>{
+   const key=REGION_FEATURE_KEYS[f.properties?.name]||'',label=mapRegionName(key);
    const path=geoPath(f.geometry.coordinates,X,Y);
-   const center=REGION_CENTERS[name];
-   const label=center?'<text class="region-label" x="'+X(center[1])+'" y="'+Y(center[0])+'">'+(name==='Ysyk-Köl'?'Ысык-Көл':name==='Jalal-Abad'?'Жалал-Абад':name==='Chuy'?'Чүй':name==='Talas'?'Талас':name==='Batken'?'Баткен':name==='Osh'?'Ош':name==='Naryn'?'Нарын':name==='Bishkek'?'Бишкек':name)+'</text>':'';
-   return '<path class="oblast '+(mreg===key?'selected':'')+'" d="'+path+'" data-region="'+key+'" tabindex="0" role="button" aria-label="'+name+'" vector-effect="non-scaling-stroke"/>'+label;
+   const c=REGION_ANCHORS[key]||[41.5,75];
+   return '<g class="kg-region '+(mreg===key?'selected':'')+'" data-region="'+key+'" tabindex="0" role="button" aria-label="'+label.replace(/"/g,'&quot;')+'" aria-pressed="'+(mreg===key)+'"><path class="oblast" d="'+path+'"/><text class="region-label" x="'+X(c[1])+'" y="'+Y(c[0])+'">'+label+'</text></g>';
   }).join('');
   const points=D.filter(d=>(!mreg||d.rg===mreg)&&(!mty||d.a.includes(mty))).map(d=>'<g class="map-point" data-mk="'+d.id+'" tabindex="0" role="button" aria-label="'+pk(d.n)+'" transform="translate('+X(d.lo)+' '+Y(d.la)+')"><circle class="point-halo" r="12"/><circle class="point-core" r="5.5"/><title>'+pk(d.n)+'</title></g>').join('');
-  root.innerHTML='<svg class="kg-map" viewBox="0 0 '+W+' '+H+'" role="group" aria-label="Интерактивная карта Кыргызстана с областями и достопримечательностями"><defs><linearGradient id="kgSea" x2="0" y2="1"><stop stop-color="#e8f1ec"/><stop offset="1" stop-color="#d8e7e2"/></linearGradient><linearGradient id="kgLand" x2="1" y2="1"><stop stop-color="#e4d9b9"/><stop offset="1" stop-color="#b9c9a9"/></linearGradient><pattern id="kgTerrain" width="54" height="42" patternUnits="userSpaceOnUse"><path d="M-8 28 Q10 3 27 23 T62 12" fill="none" stroke="#718b70" stroke-opacity=".16" stroke-width="2"/></pattern></defs><rect width="'+W+'" height="'+H+'" rx="18" fill="url(#kgSea)"/><path d="M0 95 Q210 30 400 90 T900 70 M0 410 Q260 350 470 425 T900 390" fill="none" stroke="#fff" stroke-width="2" opacity=".65"/><g class="oblasts">'+regionShapes+'</g><g class="map-points">'+points+'</g><text x="24" y="478" class="map-caption">КЫРГЫЗСТАН · ОБЛАСТИ И ТУРИСТИЧЕСКИЕ МЕСТА</text></svg>';
+  root.innerHTML='<svg class="kg-map" viewBox="0 0 '+W+' '+H+'" role="group" aria-label="'+(L==='ru'?'Интерактивная карта Кыргызстана':L==='ky'?'Кыргызстандын интерактивдүү картасы':L==='es'?'Mapa interactivo de Kirguistán':'Interactive map of Kyrgyzstan')+'"><defs><linearGradient id="kgSea" x2="0" y2="1"><stop stop-color="#e8f1ec"/><stop offset="1" stop-color="#d8e7e2"/></linearGradient><linearGradient id="kgLand" x2="1" y2="1"><stop stop-color="#e4d9b9"/><stop offset="1" stop-color="#b9c9a9"/></linearGradient></defs><rect width="'+W+'" height="'+H+'" rx="18" fill="url(#kgSea)"/><g class="oblasts">'+shapes+'</g><g class="map-points">'+points+'</g><text x="24" y="478" class="map-caption">'+(L==='ru'?'КЫРГЫЗСТАН · ОБЛАСТИ И МЕСТА':L==='ky'?'КЫРГЫЗСТАН · ОБЛУСТАР ЖАНА ЖЕРЛЕР':L==='es'?'KIRGUISTÁN · REGIONES Y LUGARES':'KYRGYZSTAN · REGIONS & PLACES')+'</text></svg>';
   mcard();
- }catch(err){console.error('Map load error',err);root.innerHTML='<div class="cb"><b>Не удалось загрузить границы областей.</b><p>'+String(err.message||err)+'</p><button class="b" onclick="location.reload()">Обновить карту</button></div>'}
+ }catch(err){if(version!==kgMapVersion)return;console.error('Map load error',err);root.innerHTML='<div class="cb"><b>Map unavailable</b><p>'+String(err.message||err)+'</p><button class="b" onclick="kgGeoPromise=null;map()">Retry</button></div>'}
 }
 
 function chips(){$('#chips').innerHTML=['',...Object.keys(R)].map(k=>`<button class="b${mreg==k?'':' o'}" data-rg="${k}">${k?pk(R[k]):t('allr')}</button>`).join('')+' '+['',...TY].map(k=>`<button class="b${mty==k?'':' o'}" data-ty="${k}">${k?t(k):t('any')}</button>`).join('')+`<span class="mt"><b style="color:#173D32">●</b> ${t('lg1')} · <b style="color:#c9a24b">●</b> ${t('lg2')}</span>`}
@@ -372,7 +373,7 @@ function lmap(){
  mcard();
  requestAnimationFrame(()=>LM.invalidateSize());
 }
-function map(){svgMap()}
+function map(){return svgMap()}
 function render(){applyI18n();selects();dests();filters();grid();exps();map();$('#hbg').innerHTML=sc(195,7,'Kyrgyzstan landscape illustration',1);$('title').textContent=`Travel Horizon — ${t('tag')}`;hydratePhotos()}
 const dlg=$('#dlg'),open=()=>{if(!dlg.open)dlg.showModal()};
 function openDest(id){const d=D.find(x=>x.id==id),rel=TR.filter(x=>x.ds.includes(id));
@@ -425,12 +426,12 @@ if(a.id=='clr'||a.id=='clr2'){F=dflt();filters();grid();return}
 if(a.dataset.t){openTour(a.dataset.t,a.dataset.f);return}
 if(a.dataset.d){openDest(a.dataset.d);return}
 if(a.dataset.x!==undefined){if(!a.dataset.x){go('#planner');return}F=dflt();F.ty=a.dataset.x;filters();grid();go('#tours');return}
-if(a.dataset.mk){sel=a.dataset.mk;map();return}
-if(a.dataset.region!==undefined){mreg=a.dataset.region;map();return}
+if(a.dataset.mk){sel=a.dataset.mk;mcard();const point=$('[data-mk="'+sel+'"]');if(point)point.classList.add('active');return}
+if(a.dataset.region!==undefined){mreg=mreg===a.dataset.region?'':a.dataset.region;map();return}
 if(a.dataset.ty!==undefined){mty=a.dataset.ty;map();return}
 if(a.dataset.rg!==undefined){mreg=a.dataset.rg;map();return}
 if(a.dataset.ft){dlg.close();F=dflt();F.ds=a.dataset.ft;filters();grid();go('#tours')}});
-document.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.dataset&&e.target.dataset.mk){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
+document.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.dataset&&(e.target.dataset.mk||e.target.dataset.region!==undefined)){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
 $('#fl').addEventListener('input',e=>{const m={fb:['bud',Number],fd:['dur',Number],fdf:['df',String],fty:['ty',String],fds:['ds',String],fmo:['mo',Number],fso:['so',String]}[e.target.id];if(!m)return;F[m[0]]=m[1](e.target.value);$('#bv').textContent=usd(F.bud);$('#dv').textContent=F.dur;grid()});
 $$('.lang').forEach(s=>s.addEventListener('change',e=>{L=e.target.value;try{localStorage.setItem('thl',L)}catch(x){}render()}));
 $('#hs').addEventListener('submit',e=>{e.preventDefault();F=dflt();F.ds=$('#hd').value;F.ty=$('#hty').value;PD=$('#hdt').value;PT=Math.min(20,Math.max(1,+$('#htr').value||2));if(PD)F.mo=new Date(PD+'T12:00').getMonth()+1;filters();grid();go('#tours')});
