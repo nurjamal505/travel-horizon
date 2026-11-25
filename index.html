@@ -440,7 +440,7 @@ if(a.id=='clr'||a.id=='clr2'){F=dflt();filters();grid();return}
 if(a.dataset.t){openTour(a.dataset.t,a.dataset.f);return}
 if(a.dataset.d){openDest(a.dataset.d);return}
 if(a.dataset.x!==undefined){if(!a.dataset.x){go('#planner');return}F=dflt();F.ty=a.dataset.x;filters();grid();go('#tours');return}
-if(a.dataset.mk){sel=a.dataset.mk;$('.map-point.active').forEach(p=>p.classList.remove('active'));a.classList.add('active');mcard();return}
+if(a.dataset.mk){sel=a.dataset.mk;$$('.map-point.active').forEach(p=>p.classList.remove('active'));a.classList.add('active');mcard();return}
 if(a.dataset.region!==undefined){mreg=mreg===a.dataset.region?'':a.dataset.region;map();return}
 if(a.dataset.ty!==undefined){mty=a.dataset.ty;map();return}
 if(a.dataset.rg!==undefined){mreg=a.dataset.rg;map();return}
