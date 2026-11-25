@@ -166,6 +166,12 @@ const D=[['ik','Issyk-Kul|Иссык-Куль|Ысык-Көл|Issyk-Kul',42.45,7
 ['al','Alay Valley|Алайская долина|Алай өрөөнү|Valle de Alay',39.65,72.9,'so',140,'2–3',[6,9],['trek','road'],'A vast high valley facing the Pamir peaks.|Огромная высокогорная долина напротив пиков Памира.|Памир чокуларына каратылган кең бийик өрөөн.|Un vasto valle de altura frente a las cumbres del Pamir.'],
 ['sch','Sary-Chelek|Сары-Челек|Сары-Челек|Sary-Chelek',41.83,71.95,'so',130,'2',[5,9],['trek'],'A forest lake in a protected biosphere reserve.|Лесное озеро в биосферном заповеднике.|Биосфералык коруктагы токойлуу көл.|Un lago entre bosques en una reserva de la biosfera.']]
 .map((a,i)=>({id:a[0],n:a[1],la:a[2],lo:a[3],rg:a[4],h:a[5],du:a[6],m:a[7],a:a[8],ds:a[9],i:i+1}));
+// Additional map pins for the capital and key transit towns.
+D.push(
+ {id:'bi',n:'Bishkek|Бишкек|Бишкек|Bishkek',la:42.8746,lo:74.5698,rg:'ch',h:195,du:'1–2',m:[1,12],a:['culture','road'],ds:'The capital, museums, markets and gateway to the Tian Shan.|Столица, музеи, базары и ворота к Тянь-Шаню.|Борбор шаар, музейлер, базарлар жана Теңир-Тоого жол.|Capital, museos, mercados y puerta de entrada al Tian Shan.'},
+ {id:'ny',n:'Naryn|Нарын|Нарын|Naryn',la:41.4287,lo:75.9911,rg:'na',h:35,du:'1',m:[1,12],a:['culture','road'],ds:'A mountain town and gateway to Tash-Rabat and high valleys.|Горный город и отправная точка к Таш-Рабату и высокогорным долинам.|Таш-Рабатка жана бийик өрөөндөргө жол ачкан тоолуу шаар.|Ciudad de montaña y puerta a Tash-Rabat y valles altos.'},
+ {id:'ko',n:'Kochkor|Кочкор|Кочкор|Kochkor',la:42.215,lo:75.756,rg:'na',h:45,du:'1',m:[1,12],a:['nomad','culture'],ds:'A craft village known for felt making and routes to Song-Kul.|Село мастеров, известное войлоковалянием и дорогой к Сон-Кулю.|Кийиз өнөрү жана Сөн-Көлгө баруучу жолдору менен белгилүү айыл.|Pueblo artesanal famoso por el fieltro y las rutas a Song-Kul.'}
+);
 /* Central tour data: edit prices/routes here. Prices are illustrative. */
 const TR=[['t1','Kyrgyzstan Highlights|Главное в Кыргызстане|Кыргызстандын көрүнүктүү жерлери|Lo mejor de Kirguistán',7,690,'e',['culture','road'],'Bishkek · Ala-Archa · Issyk-Kul · Karakol',['aa','ik','kr'],[5,10],0],
 ['t2','The Nomad Experience|Жизнь кочевников|Көчмөндөр жашоосу|La experiencia nómada',3,295,'e',['nomad'],'Bishkek · Kochkor · Song-Kul',['sk'],[6,9],0],
@@ -243,7 +249,7 @@ function grid(){let l=TR.filter(x=>x.p<=F.bud&&x.d<=F.dur&&(!F.df||x.df==F.df)&&
 if(F.so=='p')l.sort((a,b)=>a.p-b.p);if(F.so=='d')l.sort((a,b)=>a.d-b.d);
 $('#cnt').textContent=`${l.length} ${t('cnt')}`;
 $('#tg').innerHTML=l.length?l.map(tcard).join(''):`<div class="empty"><p>${t('empty')}</p><button class="b" id="clr2">${t('clr')}</button></div>`}
-function exps(){$('#ex').innerHTML=EX.map((e,i)=>`<button data-x="${e[4]}" data-k="${e[0]}" aria-label="${pk(e[1])}">${sc(e[2],i+40,pk(e[1]),e[0]=='yurt')}<span>${pk(e[1])}${e[4]?'':` · ${t('req')}`}</span></button>`).join('')}
+function exps(){$('#ex').innerHTML=EX.map((e,i)=>`<button data-x="${e[3]}" data-k="${e[0]}" aria-label="${pk(e[1])}">${sc(e[2],i+40,pk(e[1]),e[0]=='yurt')}<span>${pk(e[1])}${e[3]?'':` · ${t('req')}`}</span></button>`).join('')}
 
 function svgMap(){const X=lo=>((lo-69.5)/11*800).toFixed(0),Y=la=>((43.5-la)/4.5*435).toFixed(0);
 $('#chips').innerHTML=['',...Object.keys(R)].map(k=>`<button class="b${mreg==k?'':' o'}" data-rg="${k}">${k?pk(R[k]):t('allr')}</button>`).join('');
@@ -304,7 +310,7 @@ function lmap(){
  mcard();
  requestAnimationFrame(()=>LM.invalidateSize());
 }
-function map(){if(!window.L){svgMap();chips();return}chips();lmap()}
+function map(){if(!window.L){chips();$('#mapc').innerHTML='<div class="cb"><p>Не удалось загрузить интерактивную карту. Проверьте соединение и обновите страницу.</p><a href="https://www.openstreetmap.org/#map=7/41.3/74.7" target="_blank" rel="noopener">Открыть карту Кыргызстана</a></div>';return}chips();lmap()}
 function render(){applyI18n();selects();dests();filters();grid();exps();map();$('#hbg').innerHTML=sc(195,7,'Kyrgyzstan landscape illustration',1);$('title').textContent=`Travel Horizon — ${t('tag')}`;hydratePhotos()}
 const dlg=$('#dlg'),open=()=>{if(!dlg.open)dlg.showModal()};
 function openDest(id){const d=D.find(x=>x.id==id),rel=TR.filter(x=>x.ds.includes(id));
