@@ -1,62 +1,33 @@
 # Travel Horizon
 
-Сайт публикуется из корня репозитория через Vercel. Основные части:
-- `index.html` — публичный сайт (EN/RU/KY/ES), интерактивная карта, автоматическая загрузка фото Wikimedia Commons.
-- `api/booking.js` — проверка заявок, отправка в Telegram и необязательное сохранение в Supabase.
-- `admin/index.html` + `api/admin.js` — защищённая панель заявок: `/admin/`.
-- `supabase/schema.sql` — таблицы для базы данных.
+Адаптивный туристический сайт о Кыргызстане. Публикация из корня репозитория через Vercel.
 
-## Vercel
+## Функции
+- Главная, направления, туры, фильтры, планировщик, FAQ и карта Leaflet.
+- Четыре языка: русский, английский, кыргызский и испанский.
+- Фотографии автоматически ищутся в Wikimedia Commons; при отсутствии подходящего фото показывается встроенная иллюстрация.
+- Карта использует Leaflet/OpenStreetMap и загружает GeoJSON областей из `data/kyrgyzstan-regions.geojson`.
+- Короткая форма заявки: имя, страна, телефон, сообщение. Выбранный тур прикрепляется автоматически.
+- `/admin/` — защищённая панель заявок (нужны Supabase Auth и таблица admins).
 
-Добавьте переменные в Settings → Environment Variables:
+## Telegram за 2 минуты
+1. В Telegram откройте @BotFather, отправьте `/newbot`, создайте бота и скопируйте токен.
+2. Откройте своего бота и нажмите **Start**.
+3. В Vercel → Project → Settings → Environment Variables добавьте `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID` для Production.
+4. Нажмите Redeploy.
+5. Отправьте тестовую заявку на сайте. Токен никогда не добавляйте в HTML, GitHub или ZIP.
 
-| Переменная | Назначение |
-|---|---|
-| `TELEGRAM_BOT_TOKEN` | Секретный токен Telegram-бота |
-| `TELEGRAM_CHAT_ID` | ID чата, куда приходят заявки |
-| `SUPABASE_URL` | URL проекта Supabase |
-| `SUPABASE_ANON_KEY` | Публичный ключ Supabase для проверки пользовательской сессии |
-| `SUPABASE_SERVICE_ROLE_KEY` | Секретный service role key, только серверная переменная |
+Chat ID можно получить после /start через `https://api.telegram.org/botTOKEN/getUpdates`, найдя `message.chat.id`. Не публикуйте ссылку с токеном.
 
-После добавления переменных сделайте Redeploy. Не помещайте токены и service role key в HTML, JavaScript браузера или GitHub.
+## Supabase и админка
+1. Создайте проект на supabase.com.
+2. Выполните `supabase/schema.sql` в SQL Editor.
+3. В Authentication → Users создайте пользователя админки.
+4. Выполните: `insert into public.admins (user_id) values ('UUID-ПОЛЬЗОВАТЕЛЯ');`
+5. Добавьте в Vercel `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+6. Сделайте Redeploy и войдите на `/admin/`.
 
-## Настройка базы и администратора
+Service role key хранить только в секретных переменных Vercel.
 
-1. Создайте проект Supabase.
-2. В SQL Editor выполните `supabase/schema.sql`.
-3. В Supabase Authentication → Users создайте пользователя администратора с email и паролем.
-4. Скопируйте UUID пользователя и выполните SQL, заменив UUID:
-
-```sql
-insert into public.admins (user_id) values ('UUID-ПОЛЬЗОВАТЕЛЯ');
-```
-
-5. Добавьте переменные Supabase в Vercel и выполните Redeploy.
-6. Откройте `https://ВАШ-ДОМЕН/admin/` и войдите созданным email и паролем.
-
-Админ API проверяет JWT через Supabase Auth и сверяет UUID пользователя с таблицей `admins`. Таблицы не открыты для анонимного доступа. Service role key используется только сервером.
-
-## Telegram: проверка доставки
-
-1. Откройте Telegram и найдите своего бота `@TRAVEL_HORIZON_REQUESTS_BOT`.
-2. Нажмите **Start** или отправьте `/start`. Бот не может первым написать пользователю, пока пользователь не открыл чат.
-3. Убедитесь, что в Vercel заданы `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`. Токен берите у BotFather и не отправляйте его в переписках или коммитах.
-4. После деплоя откройте `/admin/`, войдите и нажмите **Проверить Telegram**. При успешной настройке в чате появится тестовое сообщение.
-5. Отправьте тестовую заявку с сайта и проверьте, что пришло сообщение с номером заявки.
-
-Если тест не пришёл:
-- `telegram_not_configured`: не заданы переменные в Vercel или не было нового деплоя после их добавления.
-- `telegram_delivery_failed`: Telegram отклонил запрос. Проверьте токен, Chat ID и что бот уже запускали через `/start`.
-- `admin_not_configured`: не заданы переменные Supabase либо не настроена таблица администратора.
-
-**Важно:** адрес GitHub Pages `nurjamal505.github.io` не исполняет API. После подключения репозитория к Vercel используйте Vercel-домен как основной адрес сайта и админки. GitHub Pages можно оставить только как статическую демо-версию без отправки заявок.
-
-## Локальная разработка
-
-Установите Node.js и Vercel CLI, затем выполните `vercel dev`. Локальные секреты держите в `.env.local`, не коммитьте их.
-
-## Фото и карта
-
-Фотографии ищутся по названиям мест в Wikimedia Commons во время загрузки сайта. Это зависит от доступности Commons и качества результатов; если фото не найдено, показывается встроенная иллюстрация. Карта использует Leaflet/OpenStreetMap и загружает административные границы из geoBoundaries. Позиции туристических маркеров ориентировочные.
-
-Цены в каталоге являются демонстрационными и не подтверждают наличие туров.
+## Локально
+`npm install`, затем `npm run dev` (нужен Vercel CLI). Для локальных секретов используйте .env.local, не коммитьте его.
