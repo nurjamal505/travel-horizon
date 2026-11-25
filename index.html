@@ -250,13 +250,13 @@ async function hydrateExperiencePhotos(){
    const q=encodeURIComponent(EXPERIENCE_SEARCH[e[0]]||pk(e[1])+' Kyrgyzstan');
    const url='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=18&gsrsearch='+q+'&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=900';
    const r=await fetch(url);if(!r.ok)return;const j=await r.json();
-   const pages=Object.values(j.query?.pages||{}),allowed=/^(CC0|CC BY(?:-SA)?(?:\\s|$)|Public domain)/i;
+   const pages=Object.values(j.query?.pages||{}),allowed=/^(CC0|CC BY(?:-SA)?(?:\s|$)|Public domain)/i;
    const best=pages.find(p=>{const info=p.imageinfo?.[0],m=info?.extmetadata||{};return info?.thumburl&&allowed.test(String(m.LicenseShortName?.value||m.UsageTerms?.value||''))});
    if(!best)return;
    const info=best.imageinfo[0],meta=info.extmetadata||{};experiencePhotos[e[0]]=info.thumburl;
    const card=document.querySelector('[data-exp-photo="'+e[0]+'"]');if(!card)return;
    const img=document.createElement('img');img.src=info.thumburl;img.alt=pk(e[1]);img.loading='lazy';img.referrerPolicy='no-referrer';img.className='experience-photo';img.onerror=()=>img.remove();card.prepend(img);
-   const credit=document.createElement('a');credit.className='experience-credit';credit.href=info.descriptionurl||info.url;credit.target='_blank';credit.rel='noopener noreferrer';credit.textContent='© '+String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ').trim()+' · '+String(meta.LicenseShortName?.value||'CC').replace(/<[^>]*>/g,' ').trim();card.appendChild(credit);
+   const credit=document.createElement('a');credit.className='experience-credit';credit.href=info.descriptionurl||info.url;credit.target='_blank';credit.rel='noopener noreferrer';credit.textContent='© '+String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim()+' · '+String(meta.LicenseShortName?.value||'CC').replace(/<[^>]*>/g,' ').trim();card.appendChild(credit);
   }catch(err){console.warn('Experience image unavailable',e[0],err.message)}
  }));
 }
@@ -416,6 +416,7 @@ dlg.addEventListener('submit',async e=>{
 dlg.addEventListener('input',e=>{const n=e.target.name;if(n=='cc')e.target.dataset.m=1;if(n=='country'){const c=Object.keys(CC).find(k=>cname(k)==e.target.value),cc=e.target.form.elements.cc;if(c&&!cc.dataset.m)cc.value='+'+CC[c]}});
 $('#dx').onclick=()=>dlg.close();dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
 const go=s=>$(s).scrollIntoView();
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-mk],[data-region]')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
 document.addEventListener('click',e=>{const a=e.target.closest('[data-t],[data-d],[data-x],[data-mk],[data-rg],[data-region],[data-ty],[data-ft],#dm,#clr,#clr2,#bg,#nv a');if(!a)return;
 if(a.id=='bg'){const o=$('#nv').classList.toggle('open');a.setAttribute('aria-expanded',o);return}
 if(a.closest('#nv')){$('#nv').classList.remove('open');return}
