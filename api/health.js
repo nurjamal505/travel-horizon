@@ -1,7 +1,8 @@
-// Safe diagnostic endpoint. Never returns secret values.
-module.exports=async(req,res)=>{res.setHeader('Cache-Control','no-store');const out=(s,b)=>res.status(s).json(b);if(req.method!=='GET')return out(405,{ok:false,error:'method_not_allowed'});
-const token=String(process.env.TELEGRAM_BOT_TOKEN||'').trim(),chat=String(process.env.TELEGRAM_CHAT_ID||'').trim(),url=String(process.env.SUPABASE_URL||'').trim(),service=String(process.env.SUPABASE_SERVICE_ROLE_KEY||'').trim(),anon=String(process.env.SUPABASE_ANON_KEY||'').trim();
-const result={ok:true,telegram:{configured:!!(token&&chat),tokenPresent:!!token,chatIdPresent:!!chat,valid:false,bot:null},supabase:{configured:!!(url&&service&&anon),reachable:false}};
-if(token){try{const r=await fetch('https://api.telegram.org/bot'+token+'/getMe');const j=await r.json();result.telegram.valid=!!(r.ok&&j.ok);if(j.ok){result.telegram.bot=j.result.username;if(chat){const cr=await fetch('https://api.telegram.org/bot'+token+'/getChat?chat_id='+encodeURIComponent(chat));const cj=await cr.json();result.telegram.chatReachable=!!(cr.ok&&cj.ok);if(!result.telegram.chatReachable)result.telegram.chatError=cj.error_code===400?'chat_not_found_or_bot_not_started':'chat_api_error'}}else result.telegram.error=j.error_code===401?'invalid_token':'telegram_api_error'}catch(e){result.telegram.error='network_error'}}
-if(url&&service&&anon){try{const r=await fetch(url.replace(/\/+$/,'')+'/rest/v1/admins?select=user_id&limit=1',{headers:{apikey:service,Authorization:'Bearer '+service}});result.supabase.reachable=r.ok;if(!r.ok)result.supabase.error='database_api_error'}catch(e){result.supabase.error='network_error'}}
-return out(200,result)};
+module.exports=async(req,res)=>{
+ res.setHeader('Cache-Control','no-store');
+ if(req.method!=='GET')return res.status(405).json({ok:false,error:'method_not_allowed'});
+ const token=String(process.env.TELEGRAM_BOT_TOKEN||'').trim(),chat=String(process.env.TELEGRAM_CHAT_ID||'').trim();
+ const result={ok:true,telegram:{configured:!!(token&&chat),valid:false,chatReachable:false,bot:null},admin:{configured:!!(process.env.ADMIN_PASSWORD&&process.env.ADMIN_SESSION_SECRET)},storage:{configured:!!process.env.BLOB_READ_WRITE_TOKEN}};
+ if(token){try{const r=await fetch('https://api.telegram.org/bot'+token+'/getMe');const j=await r.json();result.telegram.valid=!!(r.ok&&j.ok);if(j.ok){result.telegram.bot=j.result.username;if(chat){const c=await fetch('https://api.telegram.org/bot'+token+'/getChat?chat_id='+encodeURIComponent(chat));const cj=await c.json();result.telegram.chatReachable=!!(c.ok&&cj.ok);if(!result.telegram.chatReachable)result.telegram.chatError=cj.error_code===400?'chat_not_found_or_bot_not_started':'chat_api_error'}}else result.telegram.error=j.error_code===401?'invalid_token':'telegram_api_error'}catch(e){result.telegram.error='network_error'}}
+ return res.status(200).json(result);
+};
