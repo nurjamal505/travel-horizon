@@ -84,7 +84,7 @@ dialog{max-width:860px;width:calc(100% - 24px);max-height:92vh;border:0;border-r
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:600px){.fg{grid-template-columns:1fr}}
 em{color:#b3361b;font-style:normal;font-size:.78rem;min-height:1em}
 .warn{background:#fff3d6;color:#5b4300;border-radius:10px;padding:10px 14px}
-.kv{padding-left:18px}.leaflet-container{font:inherit;border-radius:16px;z-index:0}.im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.kv{padding-left:18px}.leaflet-container{font:inherit;border-radius:16px;z-index:0}.im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.photo-credit{position:absolute;right:7px;bottom:7px;z-index:2;max-width:85%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#111b;color:#fff;border-radius:6px;padding:3px 7px;font-size:10px;line-height:1.4;text-decoration:none}
 
 </style>
 </head>
@@ -195,7 +195,7 @@ return `<svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" role="im
 function applyI18n(){document.documentElement.lang=L;$$('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));$$('.lang').forEach(s=>s.value=L)}
 function fill(el,opts,anyKey){const p=el.value;el.innerHTML=(anyKey?`<option value="">${t('any')}</option>`:'')+opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');el.value=p;if(el.value!==p)el.selectedIndex=0}
 const TY=['trek','nomad','culture','road'];
-const IMG={}; // Licensed Wikimedia Commons photos; SVG illustrations remain the fallback.
+const IMG={},PHOTO_CREDIT={}; // Licensed Wikimedia Commons photos; SVG illustrations remain the fallback.
 let photoLoadStarted=false;
 async function hydratePhotos(){
  if(photoLoadStarted)return;photoLoadStarted=true;
@@ -207,11 +207,12 @@ async function hydratePhotos(){
    const r=await fetch(u);if(!r.ok)return;const j=await r.json();
    const pages=Object.values(j.query?.pages||{});
    const best=pages.find(p=>{const m=p.imageinfo?.[0]?.extmetadata||{};return p.imageinfo?.[0]?.thumburl&&allowed.test(m.LicenseShortName?.value||m.UsageTerms?.value||'')});
-   if(best){IMG[d.id]=best.imageinfo[0].thumburl;const card=document.querySelector('[data-d="'+d.id+'"] .im');if(card&&!card.querySelector('img')){const im=document.createElement('img');im.src=IMG[d.id];im.alt=pk(d.n);im.loading='lazy';im.referrerPolicy='no-referrer';im.onerror=()=>im.remove();card.appendChild(im)}}
+   if(best){const info=best.imageinfo[0],meta=info.extmetadata||{};IMG[d.id]=info.thumburl;PHOTO_CREDIT[d.id]={url:info.descriptionurl||info.url,artist:String(meta.Artist?.value||'').replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ').trim(),license:String(meta.LicenseShortName?.value||meta.UsageTerms?.value||'').replace(/<[^>]*>/g,' ').trim()};const card=document.querySelector('[data-d="'+d.id+'"] .im');if(card&&!card.querySelector('img')){const im=document.createElement('img');im.src=IMG[d.id];im.alt=pk(d.n);im.loading='lazy';im.referrerPolicy='no-referrer';im.onerror=()=>im.remove();card.appendChild(im)}}
   }catch(e){console.warn('Commons photo lookup skipped',d.id)}
  }));
 }
-const pic=d=>sc(d.h,d.i,pk(d.n))+(IMG[d.id]?`<img src="${IMG[d.id]}" alt="${pk(d.n)}" loading="lazy" onerror="this.remove()">`:'');
+const photoEsc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pic=d=>sc(d.h,d.i,pk(d.n))+(IMG[d.id]?'<img src="'+photoEsc(IMG[d.id])+'" alt="'+photoEsc(pk(d.n))+'" loading="lazy" onerror="this.remove()">'+(PHOTO_CREDIT[d.id]?'<a class="photo-credit" href="'+photoEsc(PHOTO_CREDIT[d.id].url)+'" target="_blank" rel="noopener noreferrer">© '+photoEsc(PHOTO_CREDIT[d.id].artist||'Wikimedia Commons')+' · '+photoEsc(PHOTO_CREDIT[d.id].license)+'</a>':''):'');
 const CC={US:1,CA:1,MX:52,BR:55,AR:54,CL:56,CO:57,PE:51,GB:44,IE:353,FR:33,DE:49,IT:39,ES:34,PT:351,NL:31,BE:32,CH:41,AT:43,SE:46,NO:47,DK:45,FI:358,PL:48,CZ:420,GR:30,TR:90,UA:380,KZ:7,RU:7,UZ:998,KG:996,TJ:992,TM:993,BY:375,GE:995,AM:374,AZ:994,CN:86,JP:81,KR:82,IN:91,SG:65,TH:66,VN:84,MY:60,ID:62,PH:63,AU:61,NZ:64,AE:971,SA:966,IL:972,EG:20,ZA:27,HK:852,TW:886};
 const BU=['','<500','500-1000','1000-1500','1500-2500','2500+'];
 const cname=c=>{try{return new Intl.DisplayNames([L],{type:'region'}).of(c)}catch(e){return c}};
